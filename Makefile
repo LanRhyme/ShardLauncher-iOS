@@ -152,7 +152,7 @@ METHOD_PACKAGE = \
 # Function to download and unpack Java runtimes.
 METHOD_JAVA_UNPACK = \
 	cd $(SOURCEDIR)/depends; \
-	if [ ! -f "java-$(1)-openjdk/release" ] && [ ! -f "$(ls jre$(1)-*.tar.xz)" ]; then \
+	if [ ! -f "java-$(1)-openjdk/release" ] && [ -z "$$(find . -maxdepth 1 -name 'jre$(1)-*.tar.xz' -print -quit)" ]; then \
 		if [ "$(RUNNER)" != "1" ]; then \
 			wget '$(2)' -q --show-progress; \
 			unzip jre*-ios-aarch64.zip && rm jre*-ios-aarch64.zip; \
@@ -283,7 +283,7 @@ jre: native
 	$(call METHOD_JAVA_UNPACK,8,'https://crystall1ne.dev/cdn/amethyst-ios/jre8-ios-aarch64.zip'); \
 	$(call METHOD_JAVA_UNPACK,17,'https://crystall1ne.dev/cdn/amethyst-ios/jre17-ios-aarch64.zip'); \
 	$(call METHOD_JAVA_UNPACK,21,'https://crystall1ne.dev/cdn/amethyst-ios/jre21-ios-aarch64.zip'); \
-	if [ -f "$(ls jre*.tar.xz)" ]; then rm $(SOURCEDIR)/depends/jre*.tar.xz; fi; \
+	rm -f jre*.tar.xz; \
 	cd $(SOURCEDIR); \
 	rm -rf $(SOURCEDIR)/depends/java-*-openjdk/{ASSEMBLY_EXCEPTION,bin,include,jre,legal,LICENSE,man,THIRD_PARTY_README,lib/{ct.sym,jspawnhelper,libjsig.dylib,src.zip,tools.jar}}; \
 	$(call METHOD_DIRCHECK,$(OUTPUTDIR)/java_runtimes); \
