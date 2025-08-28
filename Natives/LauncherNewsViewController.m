@@ -117,4 +117,10 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     decisionHandler(WKNavigationActionPolicyAllow);
 }
 
+- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData API_AVAILABLE(ios(14.5)) {
+}
+
+- (void)downloadDidFinish:(WKDownload *)download API_AVAILABLE(ios(14.5)) {
+}
+
 @end

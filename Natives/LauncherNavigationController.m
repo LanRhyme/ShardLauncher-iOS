@@ -51,7 +51,6 @@ static void *ProgressObserverContext = &ProgressObserverContext;
     self.versionTextField.placeholder = @"Specify version...";
     self.versionTextField.leftView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
     self.versionTextField.rightView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"SpinnerArrow"] _imageWithSize:CGSizeMake(30, 30)]];
-    self.versionTextField.rightView.frame = CGRectMake(0, 0, self.versionTextField.frame.size.height * 0.9, self.versionTextField.frame.size.height * 0.9);
     self.versionTextField.leftViewMode = UITextFieldViewModeAlways;
     self.versionTextField.rightViewMode = UITextFieldViewModeAlways;
     self.versionTextField.textAlignment = NSTextAlignmentCenter;
@@ -456,6 +455,12 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     [sidebarViewController updateAccountInfo];
+}
+
+- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData API_AVAILABLE(ios(14.5)) {
+}
+
+- (void)downloadDidFinish:(WKDownload *)download API_AVAILABLE(ios(14.5)) {
 }
 
 @end

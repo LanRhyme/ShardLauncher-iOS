@@ -188,4 +188,10 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     });
 }
 
+- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData API_AVAILABLE(ios(14.5)) {
+}
+
+- (void)downloadDidFinish:(WKDownload *)download API_AVAILABLE(ios(14.5)) {
+}
+
 @end
