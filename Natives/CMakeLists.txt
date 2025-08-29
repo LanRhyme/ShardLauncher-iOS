@@ -185,15 +185,12 @@ if("${CMAKE_HOST_SYSTEM_NAME}" MATCHES "Linux|^GNU$|Android")
 target_sources(ShardLauncher PUBLIC non_darwin_utils.m)
 endif()
 
-# Add framework search paths for compiler and linker
-target_include_directories(ShardLauncher PUBLIC "${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework")
-target_link_directories(ShardLauncher PUBLIC "${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework")
-
 target_link_libraries(ShardLauncher
   PUBLIC AFNetworking
   lzma
   "-F'${CMAKE_CURRENT_LIST_DIR}/build'"
   "-F'${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks'"
+  "-F'${CMAKE_CURRENT_LIST_DIR}/external'"
   "-framework ZeroTier"
   "-framework AltKit"
   "-framework AuthenticationServices"
