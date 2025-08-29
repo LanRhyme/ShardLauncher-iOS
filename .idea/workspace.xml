@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;LanRhyme&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/LanRhyme/ShardLauncher-iOS.git&quot;,
+    &quot;accountId&quot;: &quot;bbb00f01-8d89-4692-8a7b-4fb4a44de3b2&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="31vg1ZPSm60edhTmmZ3ogwjEu1Q" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "settings.editor.selected.configurable": "preferences.fileTypes",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-WS-252.23892.411" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment="" />
+      <created>1756409748264</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1756409748264</updated>
+      <workItem from="1756409763491" duration="4019000" />
+      <workItem from="1756413840236" duration="22071000" />
+    </task>
+    <task id="LOCAL-00001" summary=":tada: 开始">
+      <option name="closed" value="true" />
+      <created>1756409830395</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1756409830395</updated>
+    </task>
+    <task id="LOCAL-00002" summary=":tada: 新增iOS 14.5 下载回调方法处理下载成功和失败事件。">
+      <option name="closed" value="true" />
+      <created>1756411339044</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1756411339044</updated>
+    </task>
+    <task id="LOCAL-00003" summary=":tada: fix">
+      <option name="closed" value="true" />
+      <created>1756412821804</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1756412821804</updated>
+    </task>
+    <task id="LOCAL-00004" summary=":tada: fix">
+      <option name="closed" value="true" />
+      <created>1756413490398</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756413490398</updated>
+    </task>
+    <task id="LOCAL-00005" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756415396737</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1756415396737</updated>
+    </task>
+    <task id="LOCAL-00006" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756415915322</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1756415915322</updated>
+    </task>
+    <task id="LOCAL-00007" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756416147820</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1756416147820</updated>
+    </task>
+    <task id="LOCAL-00008" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756416699945</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1756416699945</updated>
+    </task>
+    <task id="LOCAL-00009" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756417301235</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1756417301235</updated>
+    </task>
+    <task id="LOCAL-00010" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756417939375</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1756417939375</updated>
+    </task>
+    <task id="LOCAL-00011" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756418515780</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1756418515780</updated>
+    </task>
+    <task id="LOCAL-00012" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756419114274</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1756419114274</updated>
+    </task>
+    <task id="LOCAL-00013" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756420178886</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1756420178886</updated>
+    </task>
+    <task id="LOCAL-00014" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756420432805</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1756420432805</updated>
+    </task>
+    <task id="LOCAL-00015" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756420919048</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1756420919048</updated>
+    </task>
+    <task id="LOCAL-00016" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756421343901</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1756421343901</updated>
+    </task>
+    <task id="LOCAL-00017" summary=":tada: 修改启动器名称，优化workflow">
+      <option name="closed" value="true" />
+      <created>1756422308119</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1756422308119</updated>
+    </task>
+    <task id="LOCAL-00018" summary=":tada: 修改主题色为绿色">
+      <option name="closed" value="true" />
+      <created>1756422889143</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1756422889143</updated>
+    </task>
+    <task id="LOCAL-00019" summary=":tada: 大改ui">
+      <option name="closed" value="true" />
+      <created>1756424735896</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1756424735896</updated>
+    </task>
+    <task id="LOCAL-00020" summary=":tada: 大改ui">
+      <option name="closed" value="true" />
+      <created>1756426794803</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1756426794803</updated>
+    </task>
+    <task id="LOCAL-00021" summary=":tada: 大改ui">
+      <option name="closed" value="true" />
+      <created>1756427460844</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1756427460844</updated>
+    </task>
+    <task id="LOCAL-00022" summary=":tada: 更新workflow添加.app，修复ipa构建错误">
+      <option name="closed" value="true" />
+      <created>1756428615382</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1756428615382</updated>
+    </task>
+    <task id="LOCAL-00023" summary=":tada: 更新workflow添加.app，修复ipa构建错误">
+      <option name="closed" value="true" />
+      <created>1756429027674</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1756429027674</updated>
+    </task>
+    <task id="LOCAL-00024" summary=":tada: 名称修改">
+      <option name="closed" value="true" />
+      <created>1756431120246</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1756431120246</updated>
+    </task>
+    <task id="LOCAL-00025" summary=":tada: 名称修改">
+      <option name="closed" value="true" />
+      <created>1756431541625</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1756431541625</updated>
+    </task>
+    <task id="LOCAL-00026" summary=":tada: 名称修改">
+      <option name="closed" value="true" />
+      <created>1756431885545</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1756431885545</updated>
+    </task>
+    <task id="LOCAL-00027" summary=":tada: 名称修改">
+      <option name="closed" value="true" />
+      <created>1756432210894</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1756432210894</updated>
+    </task>
+    <task id="LOCAL-00028" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756433053558</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1756433053558</updated>
+    </task>
+    <task id="LOCAL-00029" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756433356209</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1756433356209</updated>
+    </task>
+    <task id="LOCAL-00030" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756433983515</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1756433983515</updated>
+    </task>
+    <task id="LOCAL-00031" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756434557082</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1756434557082</updated>
+    </task>
+    <task id="LOCAL-00032" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756435182683</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1756435182683</updated>
+    </task>
+    <task id="LOCAL-00033" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756436086931</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1756436086931</updated>
+    </task>
+    <task id="LOCAL-00034" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756437600918</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1756437600918</updated>
+    </task>
+    <task id="LOCAL-00035" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756438110383</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1756438110383</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="更新" />
+    <MESSAGE value="更新工作流程，使用macOS 14 运行器。&#10;" />
+    <MESSAGE value=":tada: 开始" />
+    <MESSAGE value="新增" />
+    <MESSAGE value="新增iOS 14.5 下载回调方法处理下载成功和失败事件。" />
+    <MESSAGE value="新增iOS 14.5 下载回调方法处理下载成功和失败事件。&#10;" />
+    <MESSAGE value=":tada: 新增iOS 14.5 下载回调方法处理下载成功和失败事件。" />
+    <MESSAGE value=":tada: fix" />
+    <MESSAGE value=":tada: 修改启动器名称，优化workflow" />
+    <MESSAGE value=":tada: 修改主题色为绿色" />
+    <MESSAGE value=":tada: 大改ui" />
+    <MESSAGE value=":tada: 更新workflow添加.app，修复ipa构建错误" />
+    <MESSAGE value=":tada: 名称修改" />
+    <MESSAGE value=":tada: 新ui" />
+    <option name="LAST_COMMIT_MESSAGE" value=":tada: 新ui" />
+  </component>
+</project>

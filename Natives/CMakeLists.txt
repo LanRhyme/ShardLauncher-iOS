@@ -19,6 +19,7 @@ endif()
 
 include_directories(
   "."
+  "ZeroTier"
   "external/AFNetworking/AFNetworking"
   "external/AFNetworking/UIKit+AFNetworking"
   "external/DBNumberedSlider/Classes"
@@ -150,6 +151,7 @@ add_executable(ShardLauncher
   LauncherMenuViewController.m
   LauncherNavigationController.m
   LauncherNewsViewController.m
+  LauncherOnlineViewController.m
   LauncherPreferences.m
   LauncherPreferencesViewController.m
   LauncherPrefContCfgViewController.m
@@ -177,6 +179,7 @@ add_executable(ShardLauncher
   input_bridge_v3.m
   ios_uikit_bridge.m
   utils.m
+  ZeroTier/ZeroTierBridge.m
 )
 
 if("${CMAKE_HOST_SYSTEM_NAME}" MATCHES "Linux|^GNU$|Android")
@@ -186,6 +189,7 @@ endif()
 target_link_libraries(ShardLauncher
   PUBLIC AFNetworking
   lzma
+  "${CMAKE_CURRENT_LIST_DIR}/ZeroTier/libzerotier.a"
   "-F'${CMAKE_CURRENT_LIST_DIR}/build'"
   "-F'${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks'"
   "-framework AltKit"
