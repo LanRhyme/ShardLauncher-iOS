@@ -113,10 +113,10 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: com.lanrhyme.shardlauncher-${{ matrix.platform_name }}.ipa
-          path: artifacts/org.angelauramc.amethyst-*-${{ matrix.platform_name }}.ipa
+          path: artifacts/com.lanrhyme.shardlauncher-*-${{ matrix.platform_name }}.ipa
 
       - name: Upload regular tipa
         uses: actions/upload-artifact@main
         with:
           name: com.lanrhyme.shardlauncher-${{ matrix.platform_name }}-trollstore.tipa
-          path: artifacts/org.angelauramc.amethyst-*-${{ matrix.platform_name }}-trollstore.tipa
+          path: artifacts/com.lanrhyme.shardlauncher-*-${{ matrix.platform_name }}-trollstore.tipa
