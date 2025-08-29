@@ -1,5 +1,5 @@
 #import "ZeroTierBridge.h"
-#import <zt/ZeroTierSockets.h>
+#import "ZeroTierSockets.h"
 
 @interface ZeroTierBridge () <ZeroTierNodeDelegate>
 
