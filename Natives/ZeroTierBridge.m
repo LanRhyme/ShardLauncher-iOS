@@ -1,8 +1,12 @@
 #import "ZeroTierBridge.h"
 #import "ZeroTierSockets.h"
 
-// Private framework definitions
+// --- Private/missing framework definitions ---
 
+// Forward declare the class so the protocol can use it.
+@class ZeroTierNode;
+
+// Enums and protocols that are used by ZeroTierNode but not in the public header
 typedef NS_ENUM(NSInteger, ZeroTierEvent) {
     ZeroTierEventNodeUp,
     ZeroTierEventNodeDown
@@ -21,8 +25,8 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
 - (void)zeroTierNode:(ZeroTierNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZeroTierJoinError)error;
 @end
 
-// Extend the public interface of ZeroTierNode with the methods we need
-@interface ZeroTierNode (Private)
+// Provide the full interface for the private ZeroTierNode class
+@interface ZeroTierNode : NSObject
 - (instancetype)initWithPath:(NSString *)path port:(int)port delegate:(id<ZeroTierNodeDelegate>)delegate;
 - (void)start;
 - (void)stop;
@@ -31,6 +35,8 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
 @property(readonly) uint64_t address;
 @property(readonly) BOOL online;
 @end
+
+// --- End of private definitions ---
 
 
 @interface ZeroTierBridge () <ZeroTierNodeDelegate>
