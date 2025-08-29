@@ -1,0 +1,3 @@
+/* Localized versions of Info.plist keys */
+"ShardLauncher uses the local network to find and communicate with AltServer and LAN servers." = "ShardLauncher 使用本地网络来发现 AltServer 和局域网服务器并与之通信。";
+"ShardLauncher uses the microphone to enable support for voice chat mods." = "ShardLauncher 使用麦克风来启用语音聊天模组的支持。";
