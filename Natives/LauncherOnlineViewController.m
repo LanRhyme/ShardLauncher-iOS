@@ -1,5 +1,5 @@
 #import "LauncherOnlineViewController.h"
-#import "ZeroTier/ZeroTierBridge.h"
+#import "ZeroTierBridge.h"
 
 @interface LauncherOnlineViewController () <ZeroTierBridgeDelegate, UITableViewDataSource, UITableViewDelegate>
 
@@ -12,7 +12,7 @@
 @property (nonatomic, strong) UILabel *infoLabel;
 
 // Data
-@property (nonatomic, strong) NSMutableArray<NSDictionary *> *joinedNetworks;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSDictionary *> *joinedNetworks;
 
 @end
 
@@ -22,19 +22,20 @@
     [super viewDidLoad];
     self.title = @"联机 (ZeroTier)";
     self.view.backgroundColor = [UIColor systemBackgroundColor];
-    self.joinedNetworks = [NSMutableArray new];
+    self.joinedNetworks = [NSMutableDictionary new];
 
     [self setupUI];
     
     // Start ZeroTier Node
     [ZeroTierBridge sharedInstance].delegate = self;
-    [[ZeroTierBridge sharedInstance] startNode];
+    NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"zerotier-one"];
+    [[ZeroTierBridge sharedInstance] startNodeWithHomeDirectory:homePath];
 }
 
 - (void)setupUI {
     // Status Label
     self.statusLabel = [UILabel new];
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: 正在初始化...", [[ZeroTierBridge sharedInstance] nodeID]];
+    self.statusLabel.text = @"ZT 节点: 正在初始化...";
     self.statusLabel.textAlignment = NSTextAlignmentCenter;
     self.statusLabel.font = [UIFont systemFontOfSize:12];
     self.statusLabel.textColor = [UIColor secondaryLabelColor];
@@ -43,7 +44,7 @@
 
     // Create Room Button
     self.createRoomButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.createRoomButton setTitle:@"创建房间" forState:UIControlStateNormal];
+    [self.createRoomButton setTitle:@"创建随机房间" forState:UIControlStateNormal];
     [self.createRoomButton addTarget:self action:@selector(createRoomTapped:) forControlEvents:UIControlEventTouchUpInside];
     self.createRoomButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.createRoomButton];
@@ -116,49 +117,67 @@
 #pragma mark - Actions
 
 - (void)createRoomTapped:(UIButton *)sender {
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: 正在创建网络...", [[ZeroTierBridge sharedInstance] nodeID]];
-    [[ZeroTierBridge sharedInstance] createAndJoinPrivateNetwork];
+    uint64_t randomNetworkID = 0;
+    arc4random_buf(&randomNetworkID, sizeof(randomNetworkID));
+    randomNetworkID &= 0xFFFFFFFFFFFF; // Use a 48-bit random ID
+    [[ZeroTierBridge sharedInstance] joinNetworkWithID:randomNetworkID];
 }
 
 - (void)joinRoomTapped:(UIButton *)sender {
-    NSString *networkID = self.networkIdTextField.text;
-    if (networkID.length == 0) {
+    NSString *networkIDString = self.networkIdTextField.text;
+    if (networkIDString.length == 0) {
         [self showAlertWithTitle:@"错误" message:@"请输入网络ID"];
         return;
     }
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: 正在加入 %@...", [[ZeroTierBridge sharedInstance] nodeID], networkID];
+    
+    NSScanner *scanner = [NSScanner scannerWithString:networkIDString];
+    uint64_t networkID = 0;
+    if (![scanner scanHexLongLong:&networkID]) {
+        [self showAlertWithTitle:@"错误" message:@"无效的网络ID格式"];
+        return;
+    }
+
     [[ZeroTierBridge sharedInstance] joinNetworkWithID:networkID];
 }
 
 - (void)leaveRoomTapped:(UIButton *)sender {
-    NSString *networkID = self.joinedNetworks[sender.tag][@"networkID"];
+    uint64_t networkID = sender.tag;
     [[ZeroTierBridge sharedInstance] leaveNetworkWithID:networkID];
 }
 
 #pragma mark - ZeroTierBridgeDelegate
 
-- (void)zeroTierStatusDidChange:(NSString *)status {
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: %@", [[ZeroTierBridge sharedInstance] nodeID], status];
+- (void)zeroTierNodeOnlineWithID:(uint64_t)nodeID {
+    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点: %llx | 状态: 在线", nodeID];
 }
 
-- (void)zeroTierDidJoinNetwork:(NSString *)networkID withIPAddress:(NSString *)ipAddress {
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: Online", [[ZeroTierBridge sharedInstance] nodeID]];
-    self.networkIdTextField.text = @"";
-    
-    NSDictionary *networkInfo = @{@"networkID": networkID, @"ipAddress": ipAddress};
-    [self.joinedNetworks addObject:networkInfo];
+- (void)zeroTierNodeOffline {
+    self.statusLabel.text = @"ZT 节点: 离线";
+}
+
+- (void)zeroTierDidJoinNetwork:(uint64_t)networkID {
+    NSNumber *key = @(networkID);
+    self.joinedNetworks[key] = @{@"networkID": [NSString stringWithFormat:@"%llx", networkID]};
     [self.networksTableView reloadData];
 }
 
-- (void)zeroTierDidLeaveNetwork:(NSString *)networkID {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"networkID != %@", networkID];
-    [self.joinedNetworks filterUsingPredicate:predicate];
+- (void)zeroTierDidLeaveNetwork:(uint64_t)networkID {
+    [self.joinedNetworks removeObjectForKey:@(networkID)];
     [self.networksTableView reloadData];
 }
 
-- (void)zeroTierDidFailWithError:(NSString *)error {
-    [self showAlertWithTitle:@"ZeroTier 错误" message:error];
-    self.statusLabel.text = [NSString stringWithFormat:@"ZT 节点 ID: %@ | 状态: Error", [[ZeroTierBridge sharedInstance] nodeID]];
+- (void)zeroTierFailedToJoinNetwork:(uint64_t)networkID withError:(NSString *)error {
+    [self showAlertWithTitle:[NSString stringWithFormat:@"加入 %llx 失败", networkID] message:error];
+}
+
+- (void)zeroTierDidReceiveIPAddress:(NSString *)ipAddress forNetworkID:(uint64_t)networkID {
+    NSNumber *key = @(networkID);
+    NSMutableDictionary *networkInfo = [self.joinedNetworks[key] mutableCopy];
+    if (networkInfo) {
+        networkInfo[@"ipAddress"] = ipAddress;
+        self.joinedNetworks[key] = networkInfo;
+        [self.networksTableView reloadData];
+    }
 }
 
 #pragma mark - UITableViewDataSource
@@ -169,12 +188,27 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NetworkCell" forIndexPath:indexPath];
-    NSDictionary *networkInfo = self.joinedNetworks[indexPath.row];
-    cell.textLabel.text = [NSString stringWithFormat:@"网络: %@ (IP: %@)", networkInfo[@"networkID"], networkInfo[@"ipAddress"]];
+    
+    NSArray *allNetworks = self.joinedNetworks.allValues;
+    NSDictionary *networkInfo = allNetworks[indexPath.row];
+    
+    NSString *networkID = networkInfo[@"networkID"];
+    NSString *ipAddress = networkInfo[@"ipAddress"];
+    
+    if (ipAddress) {
+        cell.textLabel.text = [NSString stringWithFormat:@"网络: %@ (IP: %@)", networkID, ipAddress];
+    } else {
+        cell.textLabel.text = [NSString stringWithFormat:@"网络: %@ (正在获取IP...)", networkID];
+    }
     
     UIButton *leaveButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [leaveButton setTitle:@"离开" forState:UIControlStateNormal];
-    leaveButton.tag = indexPath.row;
+    
+    NSScanner *scanner = [NSScanner scannerWithString:networkID];
+    uint64_t nwid = 0;
+    [scanner scanHexLongLong:&nwid];
+    leaveButton.tag = nwid;
+
     [leaveButton addTarget:self action:@selector(leaveRoomTapped:) forControlEvents:UIControlEventTouchUpInside];
     leaveButton.frame = CGRectMake(0, 0, 60, 30);
     cell.accessoryView = leaveButton;
