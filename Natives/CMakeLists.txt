@@ -31,6 +31,7 @@ include_directories(
   "external/Apple"
   "external/ballpa1n"
   "external/ballpa1n/wrapped"
+  "external/ZeroTierFramework/ios-example-app/zt.framework/Headers"
 )
 
 # For cacio support library
@@ -190,8 +191,8 @@ target_link_libraries(ShardLauncher
   lzma
   "-F'${CMAKE_CURRENT_LIST_DIR}/build'"
   "-F'${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks'"
-  "-F'${CMAKE_CURRENT_LIST_DIR}/external'"
-  "-framework ZeroTier"
+  "-F'${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app'"
+  "-framework zt"
   "-framework AltKit"
   "-framework AuthenticationServices"
   "-framework AVFoundation"

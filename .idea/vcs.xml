@@ -4,6 +4,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Natives/external/AFNetworking" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Natives/external/DBNumberedSlider" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Natives/external/ZeroTierFramework" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Natives/external/fishhook" vcs="Git" />
   </component>
 </project>
