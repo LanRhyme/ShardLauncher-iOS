@@ -1,6 +1,38 @@
 #import "ZeroTierBridge.h"
 #import "ZeroTierSockets.h"
 
+// Private framework definitions
+
+typedef NS_ENUM(NSInteger, ZeroTierEvent) {
+    ZeroTierEventNodeUp,
+    ZeroTierEventNodeDown
+};
+
+typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
+    ZeroTierJoinErrorNotFound,
+    ZeroTierJoinErrorAccessDenied
+};
+
+@protocol ZeroTierNodeDelegate <NSObject>
+- (void)zeroTierNode:(ZeroTierNode *)node event:(ZeroTierEvent)event;
+- (void)zeroTierNode:(ZeroTierNode *)node joinedNetwork:(uint64_t)networkID;
+- (void)zeroTierNode:(ZeroTierNode *)node leftNetwork:(uint64_t)networkID;
+- (void)zeroTierNode:(ZeroTierNode *)node assignedAddress:(NSString *)ip forNetwork:(uint64_t)networkID;
+- (void)zeroTierNode:(ZeroTierNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZeroTierJoinError)error;
+@end
+
+// Extend the public interface of ZeroTierNode with the methods we need
+@interface ZeroTierNode (Private)
+- (instancetype)initWithPath:(NSString *)path port:(int)port delegate:(id<ZeroTierNodeDelegate>)delegate;
+- (void)start;
+- (void)stop;
+- (void)join:(uint64_t)networkID;
+- (void)leave:(uint64_t)networkID;
+@property(readonly) uint64_t address;
+@property(readonly) BOOL online;
+@end
+
+
 @interface ZeroTierBridge () <ZeroTierNodeDelegate>
 
 @property (nonatomic, strong) ZeroTierNode *node;
