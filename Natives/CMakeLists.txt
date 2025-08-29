@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(AngelAuraAmethyst)
+project(ShardLauncher)
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
 
@@ -91,13 +91,13 @@ target_link_libraries(AFNetworking
 )
 
 # MinecraftAccount JNI
-add_library(AmethystAccountJNI SHARED
+add_library(ShardLauncherAccountJNI SHARED
   authenticator/MinecraftAccountJNI.m
 )
-target_link_libraries(AmethystAccountJNI)
+target_link_libraries(ShardLauncherAccountJNI)
 
-# Angel Aura Amethyst
-add_executable(AngelAuraAmethyst
+# ShardLauncher
+add_executable(ShardLauncher
   dyld_bypass_validation.m
   dyld_patch_platform.m
   main.m
@@ -180,10 +180,10 @@ add_executable(AngelAuraAmethyst
 )
 
 if("${CMAKE_HOST_SYSTEM_NAME}" MATCHES "Linux|^GNU$|Android")
-target_sources(AngelAuraAmethyst PUBLIC non_darwin_utils.m)
+target_sources(ShardLauncher PUBLIC non_darwin_utils.m)
 endif()
 
-target_link_libraries(AngelAuraAmethyst
+target_link_libraries(ShardLauncher
   PUBLIC AFNetworking
   lzma
   "-F'${CMAKE_CURRENT_LIST_DIR}/build'"
@@ -205,7 +205,7 @@ target_link_libraries(AngelAuraAmethyst
   "-framework WebKit"
   "-weak_framework SafariServices"
 )
-set_target_properties(AngelAuraAmethyst PROPERTIES
+set_target_properties(ShardLauncher PROPERTIES
   MACOSX_BUNDLE TRUE
   MACOSX_FRAMEWORK_IDENTIFIER org.cmake.ExecutableTarget
   MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/Info.plist")
