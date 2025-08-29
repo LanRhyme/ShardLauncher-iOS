@@ -50,6 +50,13 @@ jobs:
       - name: Checkout repository submodules
         run: git submodule update --init --recursive
 
+      - name: Download and setup ZeroTier SDK
+        run: |
+          mkdir -p Natives/ZeroTier
+          curl -L https://download.zerotier.com/dist/sdk/ZeroTierSDK_iOS_1.8.4.zip -o zerotier.zip
+          unzip zerotier.zip -d Natives/ZeroTier
+          rm zerotier.zip
+
       - name: Get gl4es latest commit hash
         id: gl4es-sha
         run: echo "::set-output name=sha::$(echo $(git ls-remote https://github.com/PojavLauncherTeam/gl4es-114-extra refs/heads/master | grep -io '^\S*'))"
