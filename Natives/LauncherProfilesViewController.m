@@ -5,7 +5,7 @@
 #import "LauncherPrefManageJREViewController.h"
 #import "LauncherProfileEditorViewController.h"
 #import "LauncherProfilesViewController.h"
-//#import "NSFileManager+NRFileManager.h"
+#import "MainContentViewController.h"
 #import "PLProfiles.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability-new"
@@ -38,6 +38,13 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
 
 - (NSString *)imageName {
     return @"MenuProfiles";
+}
+
+- (MainContentViewController *)mainContentViewController {
+    if ([self.parentViewController.parentViewController isKindOfClass:[MainContentViewController class]]) {
+        return (MainContentViewController *)self.parentViewController.parentViewController;
+    }
+    return nil;
 }
 
 - (void)viewDidLoad
@@ -85,7 +92,7 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
     [super viewWillAppear:animated];
 
     // Put navigation buttons back in place
-    self.navigationItem.rightBarButtonItems = @[[sidebarViewController drawAccountButton], self.createButtonItem];
+    self.navigationItem.rightBarButtonItems = @[self.mainContentViewController.accountButton, self.createButtonItem];
 
     // Pickup changes made in the profile editor and switching instance
     [PLProfiles updateCurrent];
@@ -122,7 +129,7 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
 }
 
 - (void)presentNavigatedViewController:(UIViewController *)vc {
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    UINavigationController *nav = [[U UINavigationController alloc] initWithRootViewController:vc];
     //nav.navigationBar.prefersLargeTitles = YES;
     [self presentViewController:nav animated:YES completion:nil];
 }

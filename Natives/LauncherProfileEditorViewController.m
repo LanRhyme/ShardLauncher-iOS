@@ -69,10 +69,10 @@
         textField.inputView = weakSelf.versionPickerView;
         // Auto pick version type
         if (self.versionList) return;
-        if ([MinecraftResourceUtils findVersion:textField.text inList:localVersionList]) {
+        if ([MinecraftResourceUtils findVersion:textField.text inList:MinecraftResourceUtils.cachedLocalVersionList]) {
             self.versionTypeControl.selectedSegmentIndex = 0;
         } else {
-            NSDictionary *selected = (id)[MinecraftResourceUtils findVersion:textField.text inList:remoteVersionList];
+            NSDictionary *selected = (id)[MinecraftResourceUtils findVersion:textField.text inList:MinecraftResourceUtils.cachedRemoteVersionList];
             if (selected) {
                 NSArray *types = @[@"installed", @"release", @"snapshot", @"old_beta", @"old_alpha"];
                 NSString *type = selected[@"type"];
@@ -271,10 +271,10 @@
     if (sender || !self.versionList) {
         if (self.versionTypeControl.selectedSegmentIndex == 0) {
             // installed
-            newVersionList = localVersionList;
+            newVersionList = MinecraftResourceUtils.cachedLocalVersionList;
         } else {
             NSString *type = @[@"installed", @"release", @"snapshot", @"old_beta", @"old_alpha"][self.versionTypeControl.selectedSegmentIndex];
-            newVersionList = [remoteVersionList filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(type == %@)", type]];
+            newVersionList = [MinecraftResourceUtils.cachedRemoteVersionList filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(type == %@)", type]];
         }
     }
 
