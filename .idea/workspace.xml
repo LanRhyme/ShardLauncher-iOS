@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/development.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/development.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" afterDir="false" />
-    </list>
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -79,23 +75,7 @@
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
       <workItem from="1756540992067" duration="11389000" />
-      <workItem from="1756563880134" duration="4656000" />
-    </task>
-    <task id="LOCAL-00042" summary=":tada: 添加 联机 页面">
-      <option name="closed" value="true" />
-      <created>1756458395463</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1756458395463</updated>
-    </task>
-    <task id="LOCAL-00043" summary=":tada: 添加 联机 页面">
-      <option name="closed" value="true" />
-      <created>1756458674708</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1756458674708</updated>
+      <workItem from="1756563880134" duration="5295000" />
     </task>
     <task id="LOCAL-00044" summary=":tada: 添加 联机 页面">
       <option name="closed" value="true" />
@@ -473,7 +453,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756566678307</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756568584707</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1756568584707</updated>
+    </task>
+    <task id="LOCAL-00092" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756568960777</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1756568960777</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

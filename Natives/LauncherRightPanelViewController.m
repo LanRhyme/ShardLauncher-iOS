@@ -39,7 +39,7 @@ NSMutableArray<NSDictionary *> *localVersionList;
     [self setupAccountUI];
     [self setupLaunchUI];
     [self setupLayoutConstraints];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAccountInfo) name:@"AccountChanged" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadProfileList) name:@"ProfilesNeedUpdate" object:nil];
 
@@ -76,7 +76,7 @@ NSMutableArray<NSDictionary *> *localVersionList;
     self.avatarImageView.translatesAutoresizingMaskIntoConstraints = NO;
     self.avatarImageView.contentMode = UIViewContentModeScaleAspectFill;
     self.avatarImageView.clipsToBounds = YES;
-    self.avatarImageView.layer.cornerRadius = 60; // Make it circular
+    self.avatarImageView.layer.cornerRadius = 15; // Make it rounded-corner square
     self.avatarImageView.userInteractionEnabled = YES;
     [self.view addSubview:self.avatarImageView];
 
@@ -152,13 +152,13 @@ NSMutableArray<NSDictionary *> *localVersionList;
         [self.accountTypeLabel.topAnchor constraintEqualToAnchor:self.playerNameLabel.bottomAnchor constant:4],
         [self.accountTypeLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16],
         [self.accountTypeLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-16],
-        
+
         // Launch UI
         [self.playButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20],
         [self.playButton.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20],
         [self.playButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
         [self.playButton.heightAnchor constraintEqualToConstant:50],
-        
+
         [self.versionTextField.bottomAnchor constraintEqualToAnchor:self.playButton.topAnchor constant:-16],
         [self.versionTextField.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20],
         [self.versionTextField.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
@@ -228,6 +228,7 @@ NSMutableArray<NSDictionary *> *localVersionList;
         self.accountTypeLabel.text = localize(@"login.option.local", nil);
     } else {
         self.accountTypeLabel.text = selected[@"xboxGamertag"];
+        self.accountTypeLabel.text = localize(@"login.option.microsoft", nil);
     }
 
     NSURL *url = [NSURL URLWithString:[selected[@"profilePicURL"] stringByReplacingOccurrencesOfString:@"\\" withString:@"/"]];

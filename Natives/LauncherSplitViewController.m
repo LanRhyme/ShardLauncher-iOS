@@ -13,6 +13,11 @@
     [super viewDidLoad];
 
     self.preferredDisplayMode = UISplitViewControllerDisplayModeOneBesideSecondary;
+
+    if (@available(iOS 14.0, *)) {
+        self.preferredPrimaryColumnWidthFraction = 0.20;
+        self.preferredSupplementaryColumnWidthFraction = 0.55;
+    }
     
     LauncherMenuViewController *menuViewController = [[LauncherMenuViewController alloc] init];
     MainContentViewController *mainContentViewController = [[MainContentViewController alloc] init];

@@ -97,15 +97,10 @@
 
     LauncherMenuCustomItem *item = self.options[indexPath.row];
     
-    if ([self mainContentViewController] && self.mainContentViewController.isSidebarExpanded) {
-        cell.textLabel.text = item.title;
-    } else {
-        cell.textLabel.text = @"";
-    }
+    cell.textLabel.text = item.title;
 
     UIImage *origImage = [UIImage systemImageNamed:item.imageName] ?: [UIImage imageNamed:item.imageName];
-    cell.imageView.image = [origImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    cell.imageView.tintColor = [UIColor labelColor];
+    cell.imageView.image = [origImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 
     return cell;
 }
