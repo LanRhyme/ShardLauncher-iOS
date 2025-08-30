@@ -109,6 +109,13 @@ jobs:
             gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=${{ matrix.platform }}
           fi
 
+      - name: Build for simulator
+        run: |
+          export PATH=/opt/homebrew/bin:$PATH
+          export SLIMMED=1
+          gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2 SIMULATOR=1
+          zip -r ShardLauncher-ios-simulator.zip build/Release-iphonesimulator/ShardLauncher.app
+
       - name: Upload regular ipa
         uses: actions/upload-artifact@main
         with:
@@ -120,3 +127,9 @@ jobs:
         with:
           name: com.lanrhyme.shardlauncher-${{ matrix.platform_name }}-trollstore.tipa
           path: artifacts/com.lanrhyme.shardlauncher-*-${{ matrix.platform_name }}-trollstore.tipa
+          
+      - name: Upload simulator build
+        uses: actions/upload-artifact@main
+        with:
+          name: ShardLauncher-ios-simulator.zip
+          path: ShardLauncher-ios-simulator.zip
