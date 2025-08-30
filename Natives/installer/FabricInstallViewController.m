@@ -1,12 +1,11 @@
 #import "FabricInstallViewController.h"
 #import "FabricUtils.h"
-#import "utils.h"
+#import "utils.h" // Re-importing for the showDialog function
 
 @interface FabricInstallViewController ()
 @property(nonatomic) FabricUtils *fabric;
-@property(nonatomic) NSMutableArray<NSString *> *versionList;
 @property(nonatomic) UIActivityIndicatorView *indicator;
-@property(nonatomic) int selectedVersion;
+@property(nonatomic) NSInteger selectedVersion;
 @end
 
 @implementation FabricInstallViewController
@@ -22,7 +21,6 @@
     [self.view addSubview:self.indicator];
     
     self.fabric = [FabricUtils new];
-    self.versionList = [NSMutableArray new];
     
     [self.indicator startAnimating];
     [self.fabric fetchVersionsWithCallback:^(NSError *err) {
@@ -55,8 +53,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.selectedVersion = indexPath.row;
     
+    NSDictionary *version = self.fabric.versions[self.selectedVersion];
+    NSString *message = [NSString stringWithFormat:@"Install Fabric for Minecraft %@?", version[@"game_version"]];
+
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:localize(@"Install", nil)
-                                                                     message:[NSString stringWithFormat:@"Install Fabric for Minecraft %@?", self.fabric.versions[self.selectedVersion][@"game_version"]]
+                                                                     message:message
                                                               preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:localize(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -76,11 +77,10 @@
             return;
         }
         
-        // Instead of modifying the global list directly,
-        // post a notification to inform other parts of the app to update.
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ProfilesNeedUpdate" object:nil];
         
-        showDialog(localize(@"Success", nil), [NSString stringWithFormat:@"Successfully installed Fabric for Minecraft %@", versionName]);
+        NSString *successMessage = [NSString stringWithFormat:@"Successfully installed Fabric for Minecraft %@", versionName];
+        showDialog(localize(@"Success", nil), successMessage);
     }];
 }
 
