@@ -6,6 +6,10 @@ static void event_cb(void *msg_ptr) {
     [[ZeroTierBridge sharedInstance] handleEvent:msg];
 }
 
+@interface ZeroTierBridge ()
+- (void)handleEvent:(zts_event_msg_t *)msg;
+@end
+
 @implementation ZeroTierBridge
 
 + (instancetype)sharedInstance {
@@ -72,7 +76,7 @@ static void event_cb(void *msg_ptr) {
             case ZTS_EVENT_ADDR_ADDED_IP6: {
                 if ([self.delegate respondsToSelector:@selector(zeroTierDidReceiveIPAddress:forNetworkID:)]) {
                     char ip_str[ZTS_IP_MAX_STR_LEN];
-                    zts_util_ntop(&msg->addr->addr, sizeof(msg->addr->addr), ip_str, ZTS_IP_MAX_STR_LEN, NULL);
+                    zts_util_ntop((struct zts_sockaddr *)&msg->addr->addr, sizeof(msg->addr->addr), ip_str, ZTS_IP_MAX_STR_LEN, NULL);
                     NSString *ip = [NSString stringWithUTF8String:ip_str];
                     [self.delegate zeroTierDidReceiveIPAddress:ip forNetworkID:msg->addr->net_id];
                 }

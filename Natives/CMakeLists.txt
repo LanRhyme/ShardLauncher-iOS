@@ -52,7 +52,10 @@ target_link_libraries(awt_xawt
   awt_headless
 )
 
-set(CMAKE_FRAMEWORK_PATH "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks")
+set(CMAKE_FRAMEWORK_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks"
+    "${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app"
+)
 
 # Force load all symbols from static libraries
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -all_load -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks")
@@ -65,7 +68,6 @@ add_library(tinygl4angle SHARED
 )
 target_link_libraries(tinygl4angle
   "${GLOBAL_LDFLAGS}"
-  "-F'${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks'"
   "-framework libEGL"
   "-framework libGLESv2"
 )
@@ -191,8 +193,6 @@ target_link_libraries(ShardLauncher
   PUBLIC AFNetworking
   lzma
   "-F'${CMAKE_CURRENT_LIST_DIR}/build'"
-  "-F'${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks'"
-  "-F'${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app'"
   "-framework zt"
   "-framework AltKit"
   "-framework AuthenticationServices"
