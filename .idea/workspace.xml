@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 添加 联机 页面-修改项目目标为ios16.4" />
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 添加 联机 页面-fix">
+      <change beforePath="$PROJECT_DIR$/entitlements.sideload.xml" beforeDir="false" afterPath="$PROJECT_DIR$/entitlements.sideload.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entitlements.trollstore.xml" beforeDir="false" afterPath="$PROJECT_DIR$/entitlements.trollstore.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -72,30 +75,6 @@
       <workItem from="1756409763491" duration="4019000" />
       <workItem from="1756413840236" duration="38622000" />
       <workItem from="1756464968508" duration="3990000" />
-    </task>
-    <task id="LOCAL-00015" summary=":tada: 修改启动器名称，优化workflow">
-      <option name="closed" value="true" />
-      <created>1756420919048</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1756420919048</updated>
-    </task>
-    <task id="LOCAL-00016" summary=":tada: 修改启动器名称，优化workflow">
-      <option name="closed" value="true" />
-      <created>1756421343901</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1756421343901</updated>
-    </task>
-    <task id="LOCAL-00017" summary=":tada: 修改启动器名称，优化workflow">
-      <option name="closed" value="true" />
-      <created>1756422308119</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1756422308119</updated>
     </task>
     <task id="LOCAL-00018" summary=":tada: 修改主题色为绿色">
       <option name="closed" value="true" />
@@ -465,7 +444,31 @@
       <option name="project" value="LOCAL" />
       <updated>1756529431682</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary=":tada: 添加 联机 页面-fix">
+      <option name="closed" value="true" />
+      <created>1756530895939</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1756530895939</updated>
+    </task>
+    <task id="LOCAL-00065" summary=":tada: 添加 联机 页面-fix">
+      <option name="closed" value="true" />
+      <created>1756534456971</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1756534456971</updated>
+    </task>
+    <task id="LOCAL-00066" summary=":tada: 添加 联机 页面-fix">
+      <option name="closed" value="true" />
+      <created>1756535288802</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1756535288802</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -499,6 +502,7 @@
     <MESSAGE value=":tada: 新ui" />
     <MESSAGE value=":tada: 添加 联机 页面" />
     <MESSAGE value=":tada: 添加 联机 页面-修改项目目标为ios16.4" />
-    <option name="LAST_COMMIT_MESSAGE" value=":tada: 添加 联机 页面-修改项目目标为ios16.4" />
+    <MESSAGE value=":tada: 添加 联机 页面-fix" />
+    <option name="LAST_COMMIT_MESSAGE" value=":tada: 添加 联机 页面-fix" />
   </component>
 </project>

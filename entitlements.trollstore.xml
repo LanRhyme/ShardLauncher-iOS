@@ -2,7 +2,7 @@
 <plist version="1.0">
 <dict>
     <key>application-identifier</key>
-    <string>org.angelauramc.amethyst</string>
+    <string>com.lanrhyme.shardlauncher</string>
     <key>get-task-allow</key>
     <true/>
 
