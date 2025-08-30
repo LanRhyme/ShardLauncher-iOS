@@ -1,6 +1,7 @@
 #import "FabricInstallViewController.h"
 #import "FabricUtils.h"
-#import "utils.h" // Re-importing for the showDialog function
+#import "utils.h"
+#import "ios_uikit_bridge.h" // Import for the showDialog function
 
 @interface FabricInstallViewController ()
 @property(nonatomic) FabricUtils *fabric;
