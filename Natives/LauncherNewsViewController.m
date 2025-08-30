@@ -54,9 +54,9 @@ UIEdgeInsets insets;
         [self showWarningAlert:@"ios19_jitdead" hasPreference:NO exitWhenCompleted:YES];
     }
 
-    self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-    self.navigationItem.rightBarButtonItem = [sidebarViewController drawAccountButton];
-    self.navigationItem.leftItemsSupplementBackButton = true;
+    // Navigation bar items have been moved to the right panel.
+    self.navigationItem.leftBarButtonItem = nil;
+    self.navigationItem.rightBarButtonItem = nil;
 }
 
 -(void)showWarningAlert:(NSString *)key hasPreference:(BOOL)isPreferenced exitWhenCompleted:(BOOL)shouldExit {
@@ -98,12 +98,8 @@ UIEdgeInsets insets;
 }
 
 - (void)adjustWebViewForSize:(CGSize)size {
-    BOOL isPortrait = size.height > size.width;
-    if (isPortrait) {
-        webView.scrollView.contentInset = UIEdgeInsetsMake(self.navigationController.navigationBar.frame.size.height + insets.top, 0, self.navigationController.navigationBar.frame.size.height + insets.bottom, 0);
-    } else {
-        webView.scrollView.contentInset = UIEdgeInsetsMake(self.navigationController.navigationBar.frame.size.height, 0, self.navigationController.navigationBar.frame.size.height, 0);
-    }
+    // The navigation bar is no longer visible, so we don't need to add top insets.
+    webView.scrollView.contentInset = UIEdgeInsetsZero;
 }
 
 - (void)webView:(WKWebView *)webView 
