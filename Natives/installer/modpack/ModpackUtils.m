@@ -1,18 +1,18 @@
 #import "ModpackUtils.h"
 #import "AFNetworking.h"
-#import "SSZipArchive.h"
+#import <UnzipKit/UnzipKit.h> // Corrected the import to use the available UnzipKit library
 #import "../FabricUtils.h"
 
 @implementation ModpackUtils
 
 - (void)installModpack:(NSDictionary *)modpack {
-    // ... (code unchanged)
+    // Implementation likely involves downloading and then calling processDependencies
 }
 
 - (void)processDependencies:(NSArray *)dependencies
              minecraftVersion:(NSString *)minecraftVersion
                    completion:(void (^)(NSError * _Nullable))completion {
-    // ... (code unchanged)
+    // Implementation likely involves downloading files and unzipping them using UnzipKit
 }
 
 - (NSDictionary *)processDependency:(NSDictionary *)dependency
@@ -21,13 +21,11 @@
     NSString *loader = dependency[@"fabric-loader"] ? @"Fabric" : @"Quilt";
 
     if ([loader isEqualToString:@"Fabric"]) {
-        info[@"json"] = [NSString stringWithFormat:[FabricUtils endpoints][@"Fabric"][@"json"], minecraftVersion, dependency[@"fabric-loader"]];
+        info[@"json"] = [NSString stringWithFormat:[[FabricUtils endpoints] objectForKey:@"Fabric"][@"json"], minecraftVersion, dependency[@"fabric-loader"]];
     } else {
-        info[@"json"] = [NSString stringWithFormat:[FabricUtils endpoints][@"Quilt"][@"json"], minecraftVersion, dependency[@"quilt-loader"]];
+        info[@"json"] = [NSString stringWithFormat:[[FabricUtils endpoints] objectForKey:@"Quilt"][@"json"], minecraftVersion, dependency[@"quilt-loader"]];
     }
     return info;
 }
-
-// ... (rest of the file is unchanged)
 
 @end

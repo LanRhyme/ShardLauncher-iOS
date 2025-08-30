@@ -4,6 +4,7 @@
 #import "utils.h"
 
 @interface FabricUtils()
+// Redeclare 'versions' as readwrite and mutable for internal use.
 @property (nonatomic, strong, readwrite) NSMutableArray<NSDictionary *> *versions;
 @end
 
@@ -29,7 +30,8 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _versions = [NSMutableArray new];
+        // Initialize the mutable array.
+        self.versions = [NSMutableArray new];
     }
     return self;
 }
@@ -87,12 +89,16 @@
         if (error) {
             callback(nil, error);
         } else {
-            [PLProfiles.current addProfile:@{
-                @"name": [NSString stringWithFormat:@"Fabric %@", gameVersion],
+            NSString *profileName = [NSString stringWithFormat:@"Fabric %@", gameVersion];
+            NSMutableDictionary *newProfile = @{
+                @"name": profileName,
                 @"lastVersionId": versionId,
                 @"type": @"custom",
                 @"icon": [FabricUtils endpoints][@"Fabric"][@"icon"]
-            }];
+            }.mutableCopy;
+            
+            // Use the correct method to add a profile
+            [PLProfiles.current.profiles setObject:newProfile forKey:profileName];
             [PLProfiles.current save];
             
             callback(gameVersion, nil);
