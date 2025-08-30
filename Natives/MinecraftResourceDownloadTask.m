@@ -102,7 +102,7 @@
 
     NSString *path = [NSString stringWithFormat:@"%1$s/versions/%2$@/%2$@.json", getenv("POJAV_GAME_DIR"), versionStr];
     // Find it again to resolve latest-*
-    version = (id)[MinecraftResourceUtils findVersion:versionStr inList:remoteVersionList];
+    version = (id)[MinecraftResourceUtils findVersion:versionStr inList:[MinecraftResourceUtils cachedRemoteVersionList]];
 
     void(^completionBlock)(void) = ^{
         self.metadata = parseJSONFromFile(path);
@@ -128,7 +128,7 @@
             [self finishDownloadWithErrorString:[json[@"NSErrorObject"] localizedDescription]];
             return;
         } else if (json[@"inheritsFrom"]) {
-            version = (id)[MinecraftResourceUtils findVersion:json[@"inheritsFrom"] inList:remoteVersionList];
+            version = (id)[MinecraftResourceUtils findVersion:json[@"inheritsFrom"] inList:[MinecraftResourceUtils cachedRemoteVersionList]];
             path = [NSString stringWithFormat:@"%1$s/versions/%2$@/%2$@.json", getenv("POJAV_GAME_DIR"), json[@"inheritsFrom"]];
         } else {
             completionBlock();
@@ -308,7 +308,7 @@
 
 - (void)finishDownloadWithError:(NSError *)error file:(NSString *)file {
     NSString *errorStr = [NSString stringWithFormat:localize(@"launcher.mcl.error_download", NULL), file, error.localizedDescription];
-    NSLog(@"[MCDL] Error: %@ %@", errorStr, NSThread.callStackSymbols);
+    NSLog(@"[MCDL] Error: %@ %@ %@", errorStr, NSThread.callStackSymbols);
     [self finishDownloadWithErrorString:errorStr];
 }
 
