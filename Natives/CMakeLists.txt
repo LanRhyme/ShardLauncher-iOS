@@ -162,7 +162,9 @@ add_executable(ShardLauncher
   LauncherPrefManageJREViewController.m
   LauncherProfileEditorViewController.m
   LauncherProfilesViewController.m
+  LauncherRightPanelViewController.m
   LauncherSplitViewController.m
+  MainContentViewController.m
   MinecraftResourceDownloadTask.m
   MinecraftResourceUtils.m
   PickTextField.m

@@ -35,6 +35,10 @@
 
 @implementation LauncherMenuViewController
 
+- (UIBarButtonItem *)drawAccountButton {
+    return self.navigationItem.rightBarButtonItem;
+}
+
 - (void)fetchLocalVersionList {
     [self.tableView reloadData];
 }
