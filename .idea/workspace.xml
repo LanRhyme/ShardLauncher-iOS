@@ -73,14 +73,7 @@
       <workItem from="1756409763491" duration="4019000" />
       <workItem from="1756413840236" duration="38622000" />
       <workItem from="1756464968508" duration="3990000" />
-    </task>
-    <task id="LOCAL-00022" summary=":tada: 更新workflow添加.app，修复ipa构建错误">
-      <option name="closed" value="true" />
-      <created>1756428615382</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1756428615382</updated>
+      <workItem from="1756537556101" duration="432000" />
     </task>
     <task id="LOCAL-00023" summary=":tada: 更新workflow添加.app，修复ipa构建错误">
       <option name="closed" value="true" />
@@ -466,7 +459,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756537517050</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary=":tada: 添加模拟器测试构建">
+      <option name="closed" value="true" />
+      <created>1756537960577</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1756537960578</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
