@@ -20,6 +20,9 @@ static BaseAuthenticator *current = nil;
 }
 
 + (id)loadSavedName:(NSString *)name {
+    if (name == nil || [name length] == 0) {
+        return nil;
+    }
     NSMutableDictionary *authData = parseJSONFromFile([NSString stringWithFormat:@"%s/accounts/%@.json", getenv("POJAV_HOME"), name]);
     if (authData[@"NSErrorObject"] != nil) {
         NSError *error = ((NSError *)authData[@"NSErrorObject"]);
