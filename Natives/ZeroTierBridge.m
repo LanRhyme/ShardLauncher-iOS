@@ -1,11 +1,10 @@
 #import "ZeroTierBridge.h"
-#import <zt/ZeroTier.h>
+#import "ZeroTierSockets.h"
 
-@interface ZeroTierBridge () <ZeroTierNodeDelegate>
-
-@property (nonatomic, strong) ZeroTierNode *node;
-
-@end
+static void event_cb(void *msg_ptr) {
+    zts_event_msg_t *msg = (zts_event_msg_t *)msg_ptr;
+    [[ZeroTierBridge sharedInstance] handleEvent:msg];
+}
 
 @implementation ZeroTierBridge
 
@@ -19,90 +18,66 @@
 }
 
 - (void)startNodeWithHomeDirectory:(NSString *)path {
-    if (self.node) {
-        [self.node stop];
-    }
-    self.node = [[ZeroTierNode alloc] initWithPath:path port:0 delegate:self];
-    [self.node start];
+    zts_init_from_storage([path UTF8String]);
+    zts_init_set_event_handler(&event_cb);
+    zts_node_start();
 }
 
 - (void)stopNode {
-    [self.node stop];
-    self.node = nil;
+    zts_node_stop();
 }
 
 - (void)joinNetworkWithID:(uint64_t)networkID {
-    [self.node join:networkID];
+    zts_net_join(networkID);
 }
 
 - (void)leaveNetworkWithID:(uint64_t)networkID {
-    [self.node leave:networkID];
+    zts_net_leave(networkID);
 }
 
 - (uint64_t)nodeID {
-    return self.node.address;
+    return zts_node_get_id();
 }
 
 - (BOOL)isNodeOnline {
-    return self.node.online;
+    return zts_node_is_online();
 }
 
-#pragma mark - ZeroTierNodeDelegate
-
-- (void)zeroTierNode:(ZeroTierNode *)node event:(ZeroTierEvent)event {
+- (void)handleEvent:(zts_event_msg_t *)msg {
     dispatch_async(dispatch_get_main_queue(), ^{
-        switch (event) {
-            case ZeroTierEventNodeUp:
+        switch (msg->event_code) {
+            case ZTS_EVENT_NODE_UP:
                 if ([self.delegate respondsToSelector:@selector(zeroTierNodeOnlineWithID:)]) {
-                    [self.delegate zeroTierNodeOnlineWithID:self.node.address];
+                    [self.delegate zeroTierNodeOnlineWithID:zts_node_get_id()];
                 }
                 break;
-            case ZeroTierEventNodeDown:
+            case ZTS_EVENT_NODE_DOWN:
                 if ([self.delegate respondsToSelector:@selector(zeroTierNodeOffline)]) {
                     [self.delegate zeroTierNodeOffline];
                 }
                 break;
-            default:
-                // Other events can be handled here if needed
+            case ZTS_EVENT_NETWORK_OK:
+                if ([self.delegate respondsToSelector:@selector(zeroTierDidJoinNetwork:)]) {
+                    [self.delegate zeroTierDidJoinNetwork:msg->network->net_id];
+                }
                 break;
-        }
-    });
-}
-
-- (void)zeroTierNode:(ZeroTierNode *)node joinedNetwork:(uint64_t)networkID {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(zeroTierDidJoinNetwork:)]) {
-            [self.delegate zeroTierDidJoinNetwork:networkID];
-        }
-    });
-}
-
-- (void)zeroTierNode:(ZeroTierNode *)node leftNetwork:(uint64_t)networkID {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(zeroTierDidLeaveNetwork:)]) {
-            [self.delegate zeroTierDidLeaveNetwork:networkID];
-        }
-    });
-}
-
-- (void)zeroTierNode:(ZeroTierNode *)node assignedAddress:(NSString *)ip forNetwork:(uint64_t)networkID {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(zeroTierDidReceiveIPAddress:forNetworkID:)]) {
-            [self.delegate zeroTierDidReceiveIPAddress:ip forNetworkID:networkID];
-        }
-    });
-}
-
-- (void)zeroTierNode:(ZeroTierNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZeroTierJoinError)error {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(zeroTierFailedToJoinNetwork:withError:)]) {
-            NSString *errorString = @"Unknown error";
-            if (error == ZeroTierJoinErrorNotFound) {
-                errorString = @"Network not found";
-            } else if (error == ZeroTierJoinErrorAccessDenied) {
-                errorString = @"Access denied";
+            case ZTS_EVENT_NETWORK_ACCESS_DENIED:
+            case ZTS_EVENT_NETWORK_NOT_FOUND:
+                if ([self.delegate respondsToSelector:@selector(zeroTierFailedToJoinNetwork:withError:)]) {
+                    NSString *errorString = (msg->event_code == ZTS_EVENT_NETWORK_NOT_FOUND) ? @"Network not found" : @"Access denied";
+                    [self.delegate zeroTierFailedToJoinNetwork:msg->network->net_id withError:errorString];
+                }
+                break;
+            case ZTS_EVENT_ADDR_ADDED_IP4:
+            case ZTS_EVENT_ADDR_ADDED_IP6: {
+                if ([self.delegate respondsToSelector:@selector(zeroTierDidReceiveIPAddress:forNetworkID:)]) {
+                    char ip_str[ZTS_IP_MAX_STR_LEN];
+                    zts_util_ntop(&msg->addr->addr, sizeof(msg->addr->addr), ip_str, ZTS_IP_MAX_STR_LEN, NULL);
+                    NSString *ip = [NSString stringWithUTF8String:ip_str];
+                    [self.delegate zeroTierDidReceiveIPAddress:ip forNetworkID:msg->addr->net_id];
+                }
+                break;
             }
-            [self.delegate zeroTierFailedToJoinNetwork:networkID withError:errorString];
         }
     });
 }
