@@ -210,6 +210,7 @@ target_link_libraries(ShardLauncher
   "-framework UnzipKit"
   "-framework WebKit"
   "-weak_framework SafariServices"
+  "-lc++"
 )
 set_target_properties(ShardLauncher PROPERTIES
   MACOSX_BUNDLE TRUE
