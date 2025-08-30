@@ -55,7 +55,7 @@ target_link_libraries(awt_xawt
 set(CMAKE_FRAMEWORK_PATH "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks")
 
 # Force load all symbols from static libraries
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -all_load -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks -F${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -all_load -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks -F${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app -F${CMAKE_CURRENT_LIST_DIR}/external")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks")
 
 find_library(LIBEGL_FRAMEWORK NAMES libEGL PATHS "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks" NO_DEFAULT_PATH)
