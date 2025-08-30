@@ -51,6 +51,16 @@ NSMutableArray<NSDictionary *> *localVersionList;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - Helpers
+
+- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize {
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
 #pragma mark - UI Setup
 
 - (void)setupShareButton {
@@ -101,7 +111,9 @@ NSMutableArray<NSDictionary *> *localVersionList;
     self.versionTextField.translatesAutoresizingMaskIntoConstraints = NO;
     self.versionTextField.placeholder = @"Specify version...";
     self.versionTextField.leftView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
-    self.versionTextField.rightView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"SpinnerArrow"] _imageWithSize:CGSizeMake(30, 30)]];
+    UIImage *spinnerImage = [UIImage imageNamed:@"SpinnerArrow"];
+    UIImage *resizedSpinnerImage = [self imageWithImage:spinnerImage scaledToSize:CGSizeMake(30, 30)];
+    self.versionTextField.rightView = [[UIImageView alloc] initWithImage:resizedSpinnerImage];
     self.versionTextField.leftViewMode = UITextFieldViewModeAlways;
     self.versionTextField.rightViewMode = UITextFieldViewModeAlways;
     self.versionTextField.textAlignment = NSTextAlignmentCenter;
@@ -314,7 +326,8 @@ NSMutableArray<NSDictionary *> *localVersionList;
 
 - (void)pickerView:(PLPickerView *)pickerView enumerateImageView:(UIImageView *)imageView forRow:(NSInteger)row forComponent:(NSInteger)component {
     if (row < 0 || row >= PLProfiles.current.profiles.allValues.count) return;
-    UIImage *fallbackImage = [[UIImage imageNamed:@"DefaultProfile"] _imageWithSize:CGSizeMake(40, 40)];
+    UIImage *fallbackImageRaw = [UIImage imageNamed:@"DefaultProfile"];
+    UIImage *fallbackImage = [self imageWithImage:fallbackImageRaw scaledToSize:CGSizeMake(40, 40)];
     NSString *urlString = PLProfiles.current.profiles.allValues[row][@"icon"];
     [imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:fallbackImage];
 }

@@ -7,7 +7,7 @@
 @interface MainContentViewController ()
 
 @property (nonatomic, strong) NSLayoutConstraint *sidebarWidthConstraint;
-@property (nonatomic, assign) BOOL isSidebarExpanded;
+@property (nonatomic, assign, readwrite) BOOL isSidebarExpanded;
 
 @end
 

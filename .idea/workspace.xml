@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Natives/LauncherMenuViewController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherMenuViewController.h" afterDir="false" />
-    </list>
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -78,23 +75,7 @@
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
       <workItem from="1756540992067" duration="11389000" />
-      <workItem from="1756563880134" duration="1219000" />
-    </task>
-    <task id="LOCAL-00039" summary=":tada: 新ui">
-      <option name="closed" value="true" />
-      <created>1756444792396</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1756444792396</updated>
-    </task>
-    <task id="LOCAL-00040" summary=":tada: 新ui">
-      <option name="closed" value="true" />
-      <created>1756445430051</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1756445430051</updated>
+      <workItem from="1756563880134" duration="2351000" />
     </task>
     <task id="LOCAL-00041" summary=":tada: 新ui">
       <option name="closed" value="true" />
@@ -472,7 +453,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756555256491</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756565220941</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1756565220941</updated>
+    </task>
+    <task id="LOCAL-00089" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756566177109</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1756566177109</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
