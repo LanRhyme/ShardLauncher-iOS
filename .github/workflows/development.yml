@@ -113,7 +113,6 @@ jobs:
         run: |
           export PATH=/opt/homebrew/bin:$PATH
           export SLIMMED=1
-          gmake clean
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=7
 
       - name: Repackage simulator build for Appetize.io
