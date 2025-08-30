@@ -74,15 +74,7 @@
       <workItem from="1756413840236" duration="38622000" />
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
-      <workItem from="1756540992067" duration="3078000" />
-    </task>
-    <task id="LOCAL-00032" summary=":tada: 新ui">
-      <option name="closed" value="true" />
-      <created>1756435182683</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1756435182683</updated>
+      <workItem from="1756540992067" duration="3480000" />
     </task>
     <task id="LOCAL-00033" summary=":tada: 新ui">
       <option name="closed" value="true" />
@@ -468,7 +460,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756544016007</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756544465858</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1756544465858</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

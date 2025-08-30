@@ -1,6 +1,6 @@
 #import "ModpackUtils.h"
 #import "AFNetworking.h"
-#import <UnzipKit/UnzipKit.h> // Corrected the import to use the available UnzipKit library
+#import "UnzipKit.h"
 #import "../FabricUtils.h"
 
 @implementation ModpackUtils
