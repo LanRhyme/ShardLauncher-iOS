@@ -9,6 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) LauncherMenuViewController *menuViewController;
 @property (nonatomic, strong) LauncherNavigationController *contentViewController;
 
+// Make this property public so the menu can access it to update its layout
+@property (nonatomic, assign) BOOL isSidebarExpanded;
+
 - (void)navigateToViewController:(UIViewController *)viewController;
 
 @end

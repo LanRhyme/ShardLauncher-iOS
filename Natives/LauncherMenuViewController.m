@@ -8,7 +8,24 @@
 #import "utils.h"
 
 @implementation LauncherMenuCustomItem
-// ... (rest of the implementation is unchanged)
+
++ (LauncherMenuCustomItem *)title:(NSString *)title imageName:(NSString *)imageName action:(id)action {
+    LauncherMenuCustomItem *item = [[LauncherMenuCustomItem alloc] init];
+    item.title = title;
+    item.imageName = imageName;
+    item.action = action;
+    return item;
+}
+
++ (LauncherMenuCustomItem *)vcClass:(Class)class {
+    id vc = [class new];
+    LauncherMenuCustomItem *item = [[LauncherMenuCustomItem alloc] init];
+    item.title = [vc title];
+    item.imageName = [vc imageName];
+    item.vcArray = @[vc];
+    return item;
+}
+
 @end
 
 @interface LauncherMenuViewController()
@@ -31,7 +48,6 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.showsVerticalScrollIndicator = NO;
 
-    // The title view is now managed by the parent MainContentViewController
     self.navigationItem.titleView = nil;
     
     self.options = @[
@@ -41,9 +57,6 @@
         [LauncherMenuCustomItem vcClass:LauncherPreferencesViewController.class],
     ].mutableCopy;
     
-    // Other menu items can be added here as before...
-
-    // Select the first item by default
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
     [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
@@ -76,8 +89,7 @@
 
     LauncherMenuCustomItem *item = self.options[indexPath.row];
     
-    // Show text only when expanded
-    if ([self mainContentViewController] && [self mainContentViewController].isSidebarExpanded) {
+    if ([self mainContentViewController] && self.mainContentViewController.isSidebarExpanded) {
         cell.textLabel.text = item.title;
     } else {
         cell.textLabel.text = @"";
@@ -97,7 +109,6 @@
     if (selected.action) {
         selected.action();
     } else if (selected.vcArray.firstObject) {
-        // Use the new navigation method with animation
         [[self mainContentViewController] navigateToViewController:selected.vcArray.firstObject];
     }
 }
