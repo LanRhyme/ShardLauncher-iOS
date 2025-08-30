@@ -28,7 +28,7 @@ UIEdgeInsets insets;
     CGSize size = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
     insets = UIApplication.sharedApplication.windows.firstObject.safeAreaInsets;
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://wiki.angelauramc.dev/patchnotes/changelogs/IOS.html"]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://shardlauncher-ios.netlify.app/"] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:60.0];
 
     WKWebViewConfiguration *webConfig = [[WKWebViewConfiguration alloc] init];
     webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webConfig];
