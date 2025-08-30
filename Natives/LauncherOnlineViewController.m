@@ -6,6 +6,7 @@
 // UI Elements
 @property (nonatomic, strong) UILabel *statusLabel;
 @property (nonatomic, strong) UIButton *createRoomButton;
+@property (nonatomic, strong) UILabel *tutorialLabel;
 @property (nonatomic, strong) UITextField *networkIdTextField;
 @property (nonatomic, strong) UIButton *joinRoomButton;
 @property (nonatomic, strong) UITableView *networksTableView;
@@ -37,6 +38,8 @@
     [ZeroTierBridge sharedInstance].delegate = self;
     NSString *homePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"zerotier-one"];
     [[ZeroTierBridge sharedInstance] startNodeWithHomeDirectory:homePath];
+    
+    [self updateUIForConnectionState];
 }
 
 - (void)setupUI {
@@ -51,10 +54,20 @@
 
     // Create Room Button
     self.createRoomButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.createRoomButton setTitle:@"创建随机房间" forState:UIControlStateNormal];
+    [self.createRoomButton setTitle:@"进入ZeroTier官网创建房间" forState:UIControlStateNormal];
     [self.createRoomButton addTarget:self action:@selector(createRoomTapped:) forControlEvents:UIControlEventTouchUpInside];
     self.createRoomButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.createRoomButton];
+
+    // Tutorial Label
+    self.tutorialLabel = [UILabel new];
+    self.tutorialLabel.text = @"创建教程：首先进入后登录账号，登录完成后默认会进入到创建第一个网络的页面，这个时候退出，重新点击此按钮，进入后点击“Create A Network”就会自动创建一个房间，在此页面的下方点击你创建的网络，在“Settings”中把Access Control设置为”Public“，然后把上方的Network ID复制给他人就可以了";
+    self.tutorialLabel.numberOfLines = 0;
+    self.tutorialLabel.textAlignment = NSTextAlignmentLeft;
+    self.tutorialLabel.font = [UIFont systemFontOfSize:12];
+    self.tutorialLabel.textColor = [UIColor secondaryLabelColor];
+    self.tutorialLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.tutorialLabel];
 
     // Network ID Text Field
     self.networkIdTextField = [UITextField new];
@@ -96,9 +109,12 @@
 
         [self.createRoomButton.topAnchor constraintEqualToAnchor:self.statusLabel.bottomAnchor constant:20],
         [self.createRoomButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [self.createRoomButton.widthAnchor constraintEqualToConstant:200],
 
-        [self.networkIdTextField.topAnchor constraintEqualToAnchor:self.createRoomButton.bottomAnchor constant:20],
+        [self.tutorialLabel.topAnchor constraintEqualToAnchor:self.createRoomButton.bottomAnchor constant:8],
+        [self.tutorialLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20],
+        [self.tutorialLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
+
+        [self.networkIdTextField.topAnchor constraintEqualToAnchor:self.tutorialLabel.bottomAnchor constant:20],
         [self.networkIdTextField.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20],
         [self.networkIdTextField.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
 
@@ -117,6 +133,15 @@
     ]];
 }
 
+- (void)updateUIForConnectionState {
+    BOOL hasJoinedNetworks = self.joinedNetworks.count > 0;
+
+    self.createRoomButton.hidden = hasJoinedNetworks;
+    self.tutorialLabel.hidden = hasJoinedNetworks;
+    self.networkIdTextField.hidden = hasJoinedNetworks;
+    self.joinRoomButton.hidden = hasJoinedNetworks;
+}
+
 - (NSString *)imageName {
     return @"network";
 }
@@ -124,10 +149,8 @@
 #pragma mark - Actions
 
 - (void)createRoomTapped:(UIButton *)sender {
-    uint64_t randomNetworkID = 0;
-    arc4random_buf(&randomNetworkID, sizeof(randomNetworkID));
-    randomNetworkID &= 0xFFFFFFFFFFFF; // Use a 48-bit random ID
-    [[ZeroTierBridge sharedInstance] joinNetworkWithID:randomNetworkID];
+    NSURL *url = [NSURL URLWithString:@"https://my.zerotier.com/"];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 - (void)joinRoomTapped:(UIButton *)sender {
@@ -166,11 +189,15 @@
     NSNumber *key = @(networkID);
     self.joinedNetworks[key] = @{@"networkID": [NSString stringWithFormat:@"%llx", networkID]};
     [self.networksTableView reloadData];
+    [self updateUIForConnectionState];
+    [self showAlertWithTitle:@"成功" message:[NSString stringWithFormat:@"已加入网络: %llx", networkID]];
 }
 
 - (void)zeroTierDidLeaveNetwork:(uint64_t)networkID {
     [self.joinedNetworks removeObjectForKey:@(networkID)];
     [self.networksTableView reloadData];
+    [self updateUIForConnectionState];
+    [self showAlertWithTitle:@"成功" message:[NSString stringWithFormat:@"已退出网络: %llx", networkID]];
 }
 
 - (void)zeroTierFailedToJoinNetwork:(uint64_t)networkID withError:(NSString *)error {
