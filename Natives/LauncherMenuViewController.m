@@ -44,8 +44,24 @@
 }
 
 - (MainContentViewController *)mainContentViewController {
-    if ([self.parentViewController isKindOfClass:[MainContentViewController class]]) {
-        return (MainContentViewController *)self.parentViewController;
+    if (@available(iOS 14.0, *)) {
+        UIViewController *vc = [self.splitViewController viewControllerForColumn:UISplitViewControllerColumnSupplementary];
+        if ([vc isKindOfClass:[MainContentViewController class]]) {
+            return (MainContentViewController *)vc;
+        } else if ([vc isKindOfClass:[UINavigationController class]]) {
+            return ((UINavigationController *)vc).viewControllers.firstObject;
+        }
+    } else {
+        for (UIViewController *vc in self.splitViewController.viewControllers) {
+            if ([vc isKindOfClass:[MainContentViewController class]]) {
+                return (MainContentViewController *)vc;
+            } else if ([vc isKindOfClass:[UINavigationController class]]) {
+                UINavigationController *nav = (UINavigationController *)vc;
+                if ([nav.viewControllers.firstObject isKindOfClass:[MainContentViewController class]]) {
+                    return (MainContentViewController *)nav.viewControllers.firstObject;
+                }
+            }
+        }
     }
     return nil;
 }
@@ -53,6 +69,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor clearColor];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.showsVerticalScrollIndicator = NO;
 
@@ -112,7 +129,11 @@
     if (selected.action) {
         selected.action();
     } else if (selected.vcArray.firstObject) {
-        [[self mainContentViewController] navigateToViewController:selected.vcArray.firstObject];
+        MainContentViewController *mainVC = [self mainContentViewController];
+        [mainVC navigateToViewController:selected.vcArray.firstObject];
+        if (self.splitViewController.isCollapsed) {
+            [self.splitViewController showDetailViewController:mainVC sender:self];
+        }
     }
 }
 
