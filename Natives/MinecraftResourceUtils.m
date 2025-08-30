@@ -7,7 +7,26 @@
 #import "ios_uikit_bridge.h"
 #import "utils.h"
 
+static NSMutableArray<NSDictionary *> *localVersionList;
+static NSMutableArray<NSDictionary *> *remoteVersionList;
+
 @implementation MinecraftResourceUtils
+
++ (NSMutableArray<NSDictionary *> *)cachedLocalVersionList {
+    return localVersionList;
+}
+
++ (void)setCachedLocalVersionList:(NSMutableArray<NSDictionary *> *)list {
+    localVersionList = list;
+}
+
++ (NSMutableArray<NSDictionary *> *)cachedRemoteVersionList {
+    return remoteVersionList;
+}
+
++ (void)setCachedRemoteVersionList:(NSMutableArray<NSDictionary *> *)list {
+    remoteVersionList = list;
+}
 
 // Handle inheritsFrom
 + (void)processVersion:(NSMutableDictionary *)json inheritsFrom:(NSMutableDictionary *)inheritsFrom {

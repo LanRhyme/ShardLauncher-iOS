@@ -8,6 +8,11 @@
 
 @interface MinecraftResourceUtils : NSObject
 
++ (NSMutableArray<NSDictionary *> *)cachedLocalVersionList;
++ (void)setCachedLocalVersionList:(NSMutableArray<NSDictionary *> *)list;
++ (NSMutableArray<NSDictionary *> *)cachedRemoteVersionList;
++ (void)setCachedRemoteVersionList:(NSMutableArray<NSDictionary *> *)list;
+
 + (void)processVersion:(NSMutableDictionary *)json inheritsFrom:(NSMutableDictionary *)inheritsFrom;
 + (void)tweakVersionJson:(NSMutableDictionary *)json;
 

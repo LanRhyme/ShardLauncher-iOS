@@ -2,6 +2,7 @@
 #import "LauncherMenuViewController.h"
 #import "LauncherNewsViewController.h"
 #import "LauncherNavigationController.h"
+#import "AccountListViewController.h"
 
 @interface MainContentViewController ()
 
@@ -57,9 +58,21 @@
     UIBarButtonItem *expandButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"sidebar.leading"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar)];
     self.menuViewController.navigationItem.leftBarButtonItem = expandButton;
     
-    // 5. Style sidebar
+    // 5. Add account button
+    self.accountButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"person.crop.circle"] style:UIBarButtonItemStylePlain target:self action:@selector(openAccountManager)];
+    self.menuViewController.navigationItem.rightBarButtonItem = self.accountButton;
+    
+    // 6. Style sidebar
     self.menuViewController.view.layer.cornerRadius = 15;
     self.menuViewController.view.clipsToBounds = YES;
+}
+
+- (void)openAccountManager {
+    AccountListViewController *vc = [AccountListViewController new];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    nav.modalPresentationStyle = UIModalPresentationPopover;
+    nav.popoverPresentationController.barButtonItem = self.accountButton;
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)toggleSidebar {
