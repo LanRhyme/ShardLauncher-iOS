@@ -3,7 +3,8 @@
 #import "PLProfiles.h"
 #import "utils.h"
 
-@interface FabricUtils()
+// Private interface for internal use
+@interface FabricUtils ()
 // Redeclare 'versions' as readwrite and mutable for internal use.
 @property (nonatomic, strong, readwrite) NSMutableArray<NSDictionary *> *versions;
 @end
@@ -42,6 +43,7 @@
     
     [manager GET:loaderUrl parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if ([responseObject isKindOfClass:[NSArray class]]) {
+            // Now we can safely add objects because self.versions is mutable internally.
             for (NSDictionary *loaderVersion in responseObject) {
                 if (loaderVersion[@"game_version"] && loaderVersion[@"version"]) {
                     [self.versions addObject:loaderVersion];

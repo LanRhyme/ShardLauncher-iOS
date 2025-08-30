@@ -5,6 +5,15 @@
 
 @implementation ModpackUtils
 
++ (void)archive:(UZKArchive *)archive extractDirectory:(NSString *)dir toPath:(NSString *)path error:(NSError **)error {
+    // TODO: Not yet implemented
+}
+
++ (NSDictionary *)infoForDependencies:(NSDictionary *)dependency {
+    // TODO: Not yet implemented
+    return @{};
+}
+
 - (void)installModpack:(NSDictionary *)modpack {
     // Implementation likely involves downloading and then calling processDependencies
 }
