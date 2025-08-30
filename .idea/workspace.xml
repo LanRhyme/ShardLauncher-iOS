@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui" />
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Natives/installer/FabricUtils.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/installer/FabricUtils.m" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -74,15 +77,7 @@
       <workItem from="1756413840236" duration="38622000" />
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
-      <workItem from="1756540992067" duration="3935000" />
-    </task>
-    <task id="LOCAL-00034" summary=":tada: 新ui">
-      <option name="closed" value="true" />
-      <created>1756437600918</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1756437600918</updated>
+      <workItem from="1756540992067" duration="6504000" />
     </task>
     <task id="LOCAL-00035" summary=":tada: 新ui">
       <option name="closed" value="true" />
@@ -468,7 +463,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756544897765</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1756545613630</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1756545613630</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

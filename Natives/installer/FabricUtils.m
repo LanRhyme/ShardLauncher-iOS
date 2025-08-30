@@ -5,8 +5,8 @@
 
 // Private interface for internal use
 @interface FabricUtils ()
-// Redeclare 'versions' as readwrite and mutable for internal use.
-@property (nonatomic, strong, readwrite) NSMutableArray<NSDictionary *> *versions;
+// Redeclare 'versions' as readwrite for internal use.
+@property (nonatomic, strong, readwrite) NSArray<NSDictionary *> *versions;
 @end
 
 @implementation FabricUtils
@@ -31,8 +31,8 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Initialize the mutable array.
-        self.versions = [NSMutableArray new];
+        // Initialize with an empty array.
+        self.versions = @[];
     }
     return self;
 }
@@ -43,13 +43,14 @@
     
     [manager GET:loaderUrl parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if ([responseObject isKindOfClass:[NSArray class]]) {
-            // Now we can safely add objects because self.versions is mutable internally.
+            NSMutableArray *mutableVersions = [NSMutableArray array];
             for (NSDictionary *loaderVersion in responseObject) {
                 if (loaderVersion[@"game_version"] && loaderVersion[@"version"]) {
-                    [self.versions addObject:loaderVersion];
+                    [mutableVersions addObject:loaderVersion];
                 }
             }
-            [self.versions sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"game_version" ascending:NO selector:@selector(compare:)]]];
+            [mutableVersions sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"game_version" ascending:NO selector:@selector(compare:)]]];
+            self.versions = [mutableVersions copy]; // Assign an immutable copy
         }
         callback(nil);
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
@@ -85,26 +86,22 @@
         [[NSFileManager defaultManager] createDirectoryAtPath:versionDir withIntermediateDirectories:YES attributes:nil error:nil];
         
         NSString *jsonPath = [versionDir stringByAppendingPathComponent:[versionId stringByAppendingString:@".json"]];
-        NSError *error;
+        
         saveJSONToFile(profileJson, jsonPath);
         
-        if (error) {
-            callback(nil, error);
-        } else {
-            NSString *profileName = [NSString stringWithFormat:@"Fabric %@", gameVersion];
-            NSMutableDictionary *newProfile = @{
-                @"name": profileName,
-                @"lastVersionId": versionId,
-                @"type": @"custom",
-                @"icon": [FabricUtils endpoints][@"Fabric"][@"icon"]
-            }.mutableCopy;
-            
-            // Use the correct method to add a profile
-            [PLProfiles.current.profiles setObject:newProfile forKey:profileName];
-            [PLProfiles.current save];
-            
-            callback(gameVersion, nil);
-        }
+        NSString *profileName = [NSString stringWithFormat:@"Fabric %@", gameVersion];
+        NSMutableDictionary *newProfile = @{
+            @"name": profileName,
+            @"lastVersionId": versionId,
+            @"type": @"custom",
+            @"icon": [FabricUtils endpoints][@"Fabric"][@"icon"]
+        }.mutableCopy;
+        
+        // Use the correct method to add a profile
+        [PLProfiles.current.profiles setObject:newProfile forKey:profileName];
+        [PLProfiles.current save];
+        
+        callback(gameVersion, nil);
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         callback(nil, error);
