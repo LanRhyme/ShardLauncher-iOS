@@ -1,8 +1,9 @@
 #import "LauncherSplitViewController.h"
+#import "LauncherMenuViewController.h"
 #import "MainContentViewController.h"
 #import "LauncherRightPanelViewController.h"
 
-@interface LauncherSplitViewController () <UISplitViewControllerDelegate>
+@interface LauncherSplitViewController ()
 
 @end
 
@@ -11,17 +12,29 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.preferredPrimaryColumnWidthFraction = 0.7;
-    self.maximumPrimaryColumnWidth = self.view.bounds.size.width * 0.7;
     self.preferredDisplayMode = UISplitViewControllerDisplayModeOneBesideSecondary;
-    self.preferredSplitBehavior = UISplitViewControllerSplitBehaviorTile;
-
+    
+    LauncherMenuViewController *menuViewController = [[LauncherMenuViewController alloc] init];
     MainContentViewController *mainContentViewController = [[MainContentViewController alloc] init];
     LauncherRightPanelViewController *rightPanelViewController = [[LauncherRightPanelViewController alloc] init];
 
-    self.viewControllers = @[mainContentViewController, rightPanelViewController];
+    if (@available(iOS 14.0, *)) {
+        [self setViewController:menuViewController forColumn:UISplitViewControllerColumnPrimary];
+        [self setViewController:mainContentViewController forColumn:UISplitViewControllerColumnSupplementary];
+        [self setViewController:rightPanelViewController forColumn:UISplitViewControllerColumnSecondary];
+    } else {
+        // Fallback on earlier versions
+        self.viewControllers = @[menuViewController, mainContentViewController, rightPanelViewController];
+    }
+}
 
-    self.delegate = self;
+- (instancetype)initWithStyle:(UISplitViewControllerStyle)style {
+    if (@available(iOS 14.0, *)) {
+        self = [super initWithStyle:UISplitViewControllerStyleTripleColumn];
+    } else {
+        self = [super initWithStyle:style];
+    }
+    return self;
 }
 
 @end
