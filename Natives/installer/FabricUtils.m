@@ -1,4 +1,11 @@
 #import "FabricUtils.h"
+#import "AFNetworking.h"
+#import "PLProfiles.h"
+#import "utils.h"
+
+@interface FabricUtils()
+@property (nonatomic, strong, readwrite) NSMutableArray<NSDictionary *> *versions;
+@end
 
 @implementation FabricUtils
 
@@ -17,6 +24,83 @@
             @"json": @"https://meta.quiltmc.org/v3/versions/loader/%@/%@/profile/json"
         }
     };
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _versions = [NSMutableArray new];
+    }
+    return self;
+}
+
+- (void)fetchVersionsWithCallback:(void (^)(NSError * _Nullable))callback {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    NSString *loaderUrl = [FabricUtils endpoints][@"Fabric"][@"loader"];
+    
+    [manager GET:loaderUrl parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        if ([responseObject isKindOfClass:[NSArray class]]) {
+            for (NSDictionary *loaderVersion in responseObject) {
+                if (loaderVersion[@"game_version"] && loaderVersion[@"version"]) {
+                    [self.versions addObject:loaderVersion];
+                }
+            }
+            [self.versions sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"game_version" ascending:NO selector:@selector(compare:)]]];
+        }
+        callback(nil);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        callback(error);
+    }];
+}
+
+- (void)installVersion:(NSInteger)index withCallback:(void (^)(NSString * _Nullable, NSError * _Nullable))callback {
+    if (index >= self.versions.count) {
+        callback(nil, [NSError errorWithDomain:@"FabricUtils" code:1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid version index"}]);
+        return;
+    }
+    
+    NSDictionary *versionInfo = self.versions[index];
+    NSString *gameVersion = versionInfo[@"game_version"];
+    NSString *loaderVersion = versionInfo[@"version"];
+    
+    NSString *profileUrlString = [NSString stringWithFormat:[FabricUtils endpoints][@"Fabric"][@"json"], gameVersion, loaderVersion];
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+
+    [manager GET:profileUrlString parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        if (![responseObject isKindOfClass:[NSDictionary class]]) {
+            callback(nil, [NSError errorWithDomain:@"FabricUtils" code:2 userInfo:@{NSLocalizedDescriptionKey: @"Invalid profile JSON"}]);
+            return;
+        }
+        
+        NSMutableDictionary *profileJson = [responseObject mutableCopy];
+        NSString *versionId = profileJson[@"id"];
+        
+        NSString *versionDir = [NSString stringWithFormat:@"%s/versions/%@", getenv("POJAV_HOME"), versionId];
+        [[NSFileManager defaultManager] createDirectoryAtPath:versionDir withIntermediateDirectories:YES attributes:nil error:nil];
+        
+        NSString *jsonPath = [versionDir stringByAppendingPathComponent:[versionId stringByAppendingString:@".json"]];
+        NSError *error;
+        saveJSONToFile(profileJson, jsonPath);
+        
+        if (error) {
+            callback(nil, error);
+        } else {
+            [PLProfiles.current addProfile:@{
+                @"name": [NSString stringWithFormat:@"Fabric %@", gameVersion],
+                @"lastVersionId": versionId,
+                @"type": @"custom",
+                @"icon": [FabricUtils endpoints][@"Fabric"][@"icon"]
+            }];
+            [PLProfiles.current save];
+            
+            callback(gameVersion, nil);
+        }
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        callback(nil, error);
+    }];
 }
 
 @end
