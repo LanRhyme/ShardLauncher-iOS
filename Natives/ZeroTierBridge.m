@@ -68,7 +68,7 @@ static void event_cb(void *msg_ptr) {
             case ZTS_EVENT_NETWORK_ACCESS_DENIED:
             case ZTS_EVENT_NETWORK_NOT_FOUND:
                 if ([self.delegate respondsToSelector:@selector(zeroTierFailedToJoinNetwork:withError:)]) {
-                    uint64_t networkId = (msg->event_code == ZTS_EVENT_NETWORK_NOT_FOUND) ? msg->net_id : msg->network->net_id;
+                    uint64_t networkId = (msg->event_code == ZTS_EVENT_NETWORK_NOT_FOUND) ? msg->netif->net_id : msg->network->net_id;
                     NSString *errorString = (msg->event_code == ZTS_EVENT_NETWORK_NOT_FOUND) ? @"Network not found" : @"Access denied";
                     [self.delegate zeroTierFailedToJoinNetwork:networkId withError:errorString];
                 }
