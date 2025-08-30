@@ -15,7 +15,7 @@
     // Use the system background color which adapts to light/dark mode
     self.view.backgroundColor = [UIColor systemBackgroundColor];
 
-    // Create colored circles that will be blurred by the view on top.
+    // Create colored circles that will be blurred.
     CGFloat circleSize = 400.0;
     UIView *topLeftCircle = [[UIView alloc] initWithFrame:CGRectMake(-circleSize/2, -circleSize/2, circleSize, circleSize)];
     topLeftCircle.backgroundColor = [UIColor.greenColor colorWithAlphaComponent:0.5];
@@ -29,19 +29,31 @@
     [self.view insertSubview:topLeftCircle atIndex:0];
     [self.view insertSubview:bottomRightCircle atIndex:1];
 
-    // Create a blur view to place over the circles, acting as a frosted glass effect for the entire background.
-    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial];
-    UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-    blurEffectView.frame = self.view.bounds;
-    blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    blurEffectView.alpha = 0.5; // As per user request for 50% transparency
-    [self.view insertSubview:blurEffectView atIndex:2];
+    // Create a strong blur effect to apply to the circles.
+    UIBlurEffect *strongBlurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThickMaterial];
 
-    self.preferredDisplayMode = UISplitViewControllerDisplayModeOneBesideSecondary;
+    // Create a blur view for the top left circle.
+    UIVisualEffectView *topLeftBlurView = [[UIVisualEffectView alloc] initWithEffect:strongBlurEffect];
+    topLeftBlurView.frame = topLeftCircle.frame;
+    topLeftBlurView.layer.cornerRadius = circleSize / 2.0;
+    topLeftBlurView.clipsToBounds = YES;
+    [self.view insertSubview:topLeftBlurView atIndex:2];
+
+    // Create a blur view for the bottom right circle.
+    UIVisualEffectView *bottomRightBlurView = [[UIVisualEffectView alloc] initWithEffect:strongBlurEffect];
+    bottomRightBlurView.frame = bottomRightCircle.frame;
+    bottomRightBlurView.layer.cornerRadius = circleSize / 2.0;
+    bottomRightBlurView.clipsToBounds = YES;
+    bottomRightBlurView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
+    [self.view insertSubview:bottomRightBlurView atIndex:3];
 
     if (@available(iOS 14.0, *)) {
-        self.preferredPrimaryColumnWidthFraction = 0.20;
-        self.preferredSupplementaryColumnWidthFraction = 0.55;
+        self.preferredDisplayMode = UISplitViewControllerDisplayModeTwoBesideSecondary;
+        self.preferredPrimaryColumnWidthFraction = 0.10;
+        self.preferredSupplementaryColumnWidthFraction = 0.65;
+    } else {
+        // Fallback on earlier versions
+        self.preferredDisplayMode = UISplitViewControllerDisplayModeAllVisible;
     }
     
     LauncherMenuViewController *menuViewController = [[LauncherMenuViewController alloc] init];

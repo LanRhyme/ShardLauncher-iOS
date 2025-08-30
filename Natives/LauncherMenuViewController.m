@@ -31,9 +31,40 @@
 @interface LauncherMenuViewController()
 @property(nonatomic) NSMutableArray<LauncherMenuCustomItem*> *options;
 @property(nonatomic) int lastSelectedIndex;
+@property(nonatomic) BOOL isExpanded;
 @end
 
 @implementation LauncherMenuViewController
+
+- (void)setupExpandButton {
+    UIImage *image;
+    if (self.isExpanded) {
+        image = [UIImage systemImageNamed:@"sidebar.left"];
+    } else {
+        image = [UIImage systemImageNamed:@"sidebar.right"];
+    }
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:image style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar)];
+}
+
+- (void)toggleSidebar {
+    self.isExpanded = !self.isExpanded;
+    
+    if (@available(iOS 14.0, *)) {
+        if (self.isExpanded) {
+            self.splitViewController.preferredPrimaryColumnWidthFraction = 0.25; // Expanded width
+        } else {
+            self.splitViewController.preferredPrimaryColumnWidthFraction = 0.10; // Collapsed width
+        }
+    }
+    
+    // Animate the width change
+    [UIView animateWithDuration:0.25 animations:^{
+        [self.splitViewController.view layoutIfNeeded];
+    }];
+
+    [self setupExpandButton]; // Update button icon
+    [self.tableView reloadData]; // Update cells to show/hide text
+}
 
 - (UIBarButtonItem *)drawAccountButton {
     return self.navigationItem.rightBarButtonItem;
@@ -44,24 +75,8 @@
 }
 
 - (MainContentViewController *)mainContentViewController {
-    if (@available(iOS 14.0, *)) {
-        UIViewController *vc = [self.splitViewController viewControllerForColumn:UISplitViewControllerColumnSupplementary];
-        if ([vc isKindOfClass:[MainContentViewController class]]) {
-            return (MainContentViewController *)vc;
-        } else if ([vc isKindOfClass:[UINavigationController class]]) {
-            return ((UINavigationController *)vc).viewControllers.firstObject;
-        }
-    } else {
-        for (UIViewController *vc in self.splitViewController.viewControllers) {
-            if ([vc isKindOfClass:[MainContentViewController class]]) {
-                return (MainContentViewController *)vc;
-            } else if ([vc isKindOfClass:[UINavigationController class]]) {
-                UINavigationController *nav = (UINavigationController *)vc;
-                if ([nav.viewControllers.firstObject isKindOfClass:[MainContentViewController class]]) {
-                    return (MainContentViewController *)nav.viewControllers.firstObject;
-                }
-            }
-        }
+    if ([self.parentViewController isKindOfClass:[MainContentViewController class]]) {
+        return (MainContentViewController *)self.parentViewController;
     }
     return nil;
 }
@@ -69,12 +84,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor clearColor];
+    self.isExpanded = NO; // Start collapsed
+
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.showsVerticalScrollIndicator = NO;
 
     self.navigationItem.titleView = nil;
     
+    [self setupExpandButton];
+
     self.options = @[
         [LauncherMenuCustomItem vcClass:LauncherNewsViewController.class],
         [LauncherMenuCustomItem vcClass:LauncherOnlineViewController.class],
@@ -114,7 +132,11 @@
 
     LauncherMenuCustomItem *item = self.options[indexPath.row];
     
-    cell.textLabel.text = item.title;
+    if (self.isExpanded) {
+        cell.textLabel.text = item.title;
+    } else {
+        cell.textLabel.text = nil;
+    }
 
     UIImage *origImage = [UIImage systemImageNamed:item.imageName] ?: [UIImage imageNamed:item.imageName];
     cell.imageView.image = [origImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
@@ -129,11 +151,7 @@
     if (selected.action) {
         selected.action();
     } else if (selected.vcArray.firstObject) {
-        MainContentViewController *mainVC = [self mainContentViewController];
-        [mainVC navigateToViewController:selected.vcArray.firstObject];
-        if (self.splitViewController.isCollapsed) {
-            [self.splitViewController showDetailViewController:mainVC sender:self];
-        }
+        [[self mainContentViewController] navigateToViewController:selected.vcArray.firstObject];
     }
 }
 

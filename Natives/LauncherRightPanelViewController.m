@@ -33,7 +33,7 @@ NSMutableArray<NSDictionary *> *localVersionList;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor = [UIColor systemBackgroundColor];
 
     [self setupShareButton];
     [self setupAccountUI];
