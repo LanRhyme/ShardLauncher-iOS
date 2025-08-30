@@ -16,6 +16,7 @@
 @property NSString* listPath;
 @property(nonatomic) BOOL isInitialVc;
 
+- (void)fetchLocalVersionList;
 - (void)restoreHighlightedSelection;
 
 @end

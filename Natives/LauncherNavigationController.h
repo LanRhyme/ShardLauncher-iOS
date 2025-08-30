@@ -9,6 +9,7 @@
 @property(nonatomic) UILabel* progressText;
 @property(nonatomic) UIButton* buttonInstall;
 
+- (void)fetchLocalVersionList;
 - (void)enterModInstallerWithPath:(NSString *)path hitEnterAfterWindowShown:(BOOL)hitEnter;
 - (void)setInteractionEnabled:(BOOL)enable forDownloading:(BOOL)downloading;
 

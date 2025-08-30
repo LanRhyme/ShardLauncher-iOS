@@ -53,6 +53,14 @@
     }
 }
 
+- (void)fetchLocalVersionList {
+    for (UIViewController *vc in self.viewControllers) {
+        if ([vc isKindOfClass:[LauncherMenuViewController class]]) {
+            [(LauncherMenuViewController *)vc fetchLocalVersionList];
+        }
+    }
+}
+
 #pragma mark - Options
 - (void)enterCustomControls {
     CustomControlsViewController *vc = [[CustomControlsViewController alloc] init];
@@ -67,9 +75,7 @@
 }
 
 - (void)enterModInstaller {
-    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc]
-        initForOpeningContentTypes:@[[UTType typeWithMIMEType:@"application/java-archive"]]
-        asCopy:YES];
+    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[[UTType typeWithMIMEType:@"application/java-archive"]] asCopy:YES];
     documentPicker.delegate = self;
     documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
     [self presentViewController:documentPicker animated:YES completion:nil];

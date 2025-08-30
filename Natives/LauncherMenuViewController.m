@@ -35,6 +35,10 @@
 
 @implementation LauncherMenuViewController
 
+- (void)fetchLocalVersionList {
+    [self.tableView reloadData];
+}
+
 - (MainContentViewController *)mainContentViewController {
     if ([self.parentViewController isKindOfClass:[MainContentViewController class]]) {
         return (MainContentViewController *)self.parentViewController;
