@@ -22,8 +22,8 @@ static void event_cb(void *msg_ptr) {
 }
 
 - (void)startNodeWithHomeDirectory:(NSString *)path {
-    zts_init_from_storage([path UTF8String]);
     zts_init_set_event_handler(&event_cb);
+    zts_init_from_storage([path UTF8String]);
     zts_node_start();
 }
 

@@ -18,9 +18,16 @@
 
 @implementation LauncherOnlineViewController
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.title = @"联机 (ZeroTier)";
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"联机 (ZeroTier)";
     self.view.backgroundColor = [UIColor systemBackgroundColor];
     self.joinedNetworks = [NSMutableDictionary new];
 
