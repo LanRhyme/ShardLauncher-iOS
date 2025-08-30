@@ -1,14 +1,14 @@
 #import "ZeroTierBridge.h"
 #import "ZeroTierSockets.h"
 
+@interface ZeroTierBridge ()
+- (void)handleEvent:(zts_event_msg_t *)msg;
+@end
+
 static void event_cb(void *msg_ptr) {
     zts_event_msg_t *msg = (zts_event_msg_t *)msg_ptr;
     [[ZeroTierBridge sharedInstance] handleEvent:msg];
 }
-
-@interface ZeroTierBridge ()
-- (void)handleEvent:(zts_event_msg_t *)msg;
-@end
 
 @implementation ZeroTierBridge
 
