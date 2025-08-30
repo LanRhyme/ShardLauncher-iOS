@@ -1,47 +1,9 @@
 #import "ZeroTierBridge.h"
 #import "ZeroTierSockets.h"
 
-// --- Private/missing framework definitions ---
+@interface ZeroTierBridge () <ZTNodeDelegate>
 
-// Forward declare the class so the protocol can use it.
-@class ZeroTierNode;
-
-// Enums and protocols that are used by ZeroTierNode but not in the public header
-typedef NS_ENUM(NSInteger, ZeroTierEvent) {
-    ZeroTierEventNodeUp,
-    ZeroTierEventNodeDown
-};
-
-typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
-    ZeroTierJoinErrorNotFound,
-    ZeroTierJoinErrorAccessDenied
-};
-
-@protocol ZeroTierNodeDelegate <NSObject>
-- (void)zeroTierNode:(ZeroTierNode *)node event:(ZeroTierEvent)event;
-- (void)zeroTierNode:(ZeroTierNode *)node joinedNetwork:(uint64_t)networkID;
-- (void)zeroTierNode:(ZeroTierNode *)node leftNetwork:(uint64_t)networkID;
-- (void)zeroTierNode:(ZeroTierNode *)node assignedAddress:(NSString *)ip forNetwork:(uint64_t)networkID;
-- (void)zeroTierNode:(ZeroTierNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZeroTierJoinError)error;
-@end
-
-// Provide the full interface for the private ZeroTierNode class
-@interface ZeroTierNode : NSObject
-- (instancetype)initWithPath:(NSString *)path port:(int)port delegate:(id<ZeroTierNodeDelegate>)delegate;
-- (void)start;
-- (void)stop;
-- (void)join:(uint64_t)networkID;
-- (void)leave:(uint64_t)networkID;
-@property(readonly) uint64_t address;
-@property(readonly) BOOL online;
-@end
-
-// --- End of private definitions ---
-
-
-@interface ZeroTierBridge () <ZeroTierNodeDelegate>
-
-@property (nonatomic, strong) ZeroTierNode *node;
+@property (nonatomic, strong) ZTNode *node;
 
 @end
 
@@ -60,7 +22,7 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     if (self.node) {
         [self.node stop];
     }
-    self.node = [[ZeroTierNode alloc] initWithPath:path port:0 delegate:self];
+    self.node = [[ZTNode alloc] initWithPath:path port:0 delegate:self];
     [self.node start];
 }
 
@@ -85,17 +47,17 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     return self.node.online;
 }
 
-#pragma mark - ZeroTierNodeDelegate
+#pragma mark - ZTNodeDelegate
 
-- (void)zeroTierNode:(ZeroTierNode *)node event:(ZeroTierEvent)event {
+- (void)ztnode:(ZTNode *)node event:(ZTEvent)event {
     dispatch_async(dispatch_get_main_queue(), ^{
         switch (event) {
-            case ZeroTierEventNodeUp:
+            case ZTEventNodeUp:
                 if ([self.delegate respondsToSelector:@selector(zeroTierNodeOnlineWithID:)]) {
                     [self.delegate zeroTierNodeOnlineWithID:self.node.address];
                 }
                 break;
-            case ZeroTierEventNodeDown:
+            case ZTEventNodeDown:
                 if ([self.delegate respondsToSelector:@selector(zeroTierNodeOffline)]) {
                     [self.delegate zeroTierNodeOffline];
                 }
@@ -107,7 +69,7 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     });
 }
 
-- (void)zeroTierNode:(ZeroTierNode *)node joinedNetwork:(uint64_t)networkID {
+- (void)ztnode:(ZTNode *)node joinedNetwork:(uint64_t)networkID {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(zeroTierDidJoinNetwork:)]) {
             [self.delegate zeroTierDidJoinNetwork:networkID];
@@ -115,7 +77,7 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     });
 }
 
-- (void)zeroTierNode:(ZeroTierNode *)node leftNetwork:(uint64_t)networkID {
+- (void)ztnode:(ZTNode *)node leftNetwork:(uint64_t)networkID {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(zeroTierDidLeaveNetwork:)]) {
             [self.delegate zeroTierDidLeaveNetwork:networkID];
@@ -123,7 +85,7 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     });
 }
 
-- (void)zeroTierNode:(ZeroTierNode *)node assignedAddress:(NSString *)ip forNetwork:(uint64_t)networkID {
+- (void)ztnode:(ZTNode *)node assignedAddress:(NSString *)ip forNetwork:(uint64_t)networkID {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(zeroTierDidReceiveIPAddress:forNetworkID:)]) {
             [self.delegate zeroTierDidReceiveIPAddress:ip forNetworkID:networkID];
@@ -131,13 +93,13 @@ typedef NS_ENUM(NSInteger, ZeroTierJoinError) {
     });
 }
 
-- (void)zeroTierNode:(ZeroTierNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZeroTierJoinError)error {
+- (void)ztnode:(ZTNode *)node failedToJoinNetwork:(uint64_t)networkID withError:(ZTJoinError)error {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(zeroTierFailedToJoinNetwork:withError:)]) {
             NSString *errorString = @"Unknown error";
-            if (error == ZeroTierJoinErrorNotFound) {
+            if (error == ZTJoinErrorNotFound) {
                 errorString = @"Network not found";
-            } else if (error == ZeroTierJoinErrorAccessDenied) {
+            } else if (error == ZTJoinErrorAccessDenied) {
                 errorString = @"Access denied";
             }
             [self.delegate zeroTierFailedToJoinNetwork:networkID withError:errorString];
