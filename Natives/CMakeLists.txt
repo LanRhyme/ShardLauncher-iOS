@@ -58,6 +58,9 @@ set(CMAKE_FRAMEWORK_PATH "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -all_load -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks -F${CMAKE_CURRENT_LIST_DIR}/external/ZeroTierFramework/ios-example-app")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -rpath @executable_path/Frameworks -rpath @loader_path/Frameworks")
 
+find_library(LIBEGL_FRAMEWORK NAMES libEGL PATHS "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks" NO_DEFAULT_PATH)
+find_library(LIBGLESV2_FRAMEWORK NAMES libGLESv2 PATHS "${CMAKE_CURRENT_LIST_DIR}/resources/Frameworks" NO_DEFAULT_PATH)
+
 # ANGLE wrapper for 1.17+
 add_library(tinygl4angle SHARED
   external/gl4es/string_utils.c
@@ -65,8 +68,8 @@ add_library(tinygl4angle SHARED
 )
 target_link_libraries(tinygl4angle
   "${GLOBAL_LDFLAGS}"
-  "-framework libEGL"
-  "-framework libGLESv2"
+  ${LIBEGL_FRAMEWORK}
+  ${LIBGLESV2_FRAMEWORK}
 )
 
 # AFNetworking
