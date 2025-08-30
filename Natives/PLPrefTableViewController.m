@@ -54,6 +54,7 @@
 
     // Put navigation buttons back in place if we're first of the navigation controller
     if (self.hasDetail && self.navigationController) {
+        LauncherMenuViewController *sidebarViewController = (LauncherMenuViewController *)self.splitViewController.viewControllers.firstObject;
         self.navigationItem.rightBarButtonItems = @[[sidebarViewController drawAccountButton], [self drawHelpButton]];
     }
 

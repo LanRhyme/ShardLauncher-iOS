@@ -16,6 +16,7 @@
 @property NSString* listPath;
 @property(nonatomic) BOOL isInitialVc;
 
+- (UIBarButtonItem *)drawAccountButton;
 - (void)fetchLocalVersionList;
 - (void)restoreHighlightedSelection;
 

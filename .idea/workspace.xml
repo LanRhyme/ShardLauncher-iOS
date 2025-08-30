@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Natives/MinecraftResourceDownloadTask.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/MinecraftResourceDownloadTask.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Natives/LauncherMenuViewController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherMenuViewController.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,6 +78,7 @@
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
       <workItem from="1756540992067" duration="11389000" />
+      <workItem from="1756563880134" duration="1219000" />
     </task>
     <task id="LOCAL-00039" summary=":tada: 新ui">
       <option name="closed" value="true" />
