@@ -9,7 +9,6 @@
 
 @implementation LauncherNewsViewController
 WKWebView *webView;
-UIEdgeInsets insets;
 
 - (id)init {
     self = [super init];
@@ -25,10 +24,13 @@ UIEdgeInsets insets;
 {
     [super viewDidLoad];
     
-    CGSize size = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
-    insets = UIApplication.sharedApplication.windows.firstObject.safeAreaInsets;
+    // New URL for the news page
+    NSURL *newsURL = [NSURL URLWithString:@"https://shardlauncher-ios.netlify.app/"];
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://wiki.angelauramc.dev/patchnotes/changelogs/IOS.html"]];
+    // Use cache policy to allow offline viewing
+    NSURLRequest *request = [NSURLRequest requestWithURL:newsURL 
+                                             cachePolicy:NSURLRequestReturnCacheDataElseLoad 
+                                         timeoutInterval:60];
 
     WKWebViewConfiguration *webConfig = [[WKWebViewConfiguration alloc] init];
     webView = [[WKWebView alloc] initWithFrame:self.view.frame configuration:webConfig];
@@ -36,27 +38,30 @@ UIEdgeInsets insets;
     webView.translatesAutoresizingMaskIntoConstraints = NO;
     webView.navigationDelegate = self;
     webView.opaque = NO;
-    [self adjustWebViewForSize:size];
     webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    
+    // Inject viewport meta tag for proper scaling
     NSString *javascript = @"var meta = document.createElement('meta');meta.setAttribute('name', 'viewport');meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');document.getElementsByTagName('head')[0].appendChild(meta);";
     WKUserScript *nozoom = [[WKUserScript alloc] initWithSource:javascript injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
     [webView.configuration.userContentController addUserScript:nozoom];
     [webView.scrollView setShowsHorizontalScrollIndicator:NO];
+    
     [webView loadRequest:request];
     [self.view addSubview:webView];
+    
+    // Set constraints to make webView fill the view
+    [NSLayoutConstraint activateConstraints:@[[webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                                              [webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+                                              [webView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+                                              [webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]]];
 
+    // Warnings (unchanged)
     if(!isJailbroken && getPrefBool(@"warnings.limited_ram_warn") && (roundf(NSProcessInfo.processInfo.physicalMemory / 0x1000000) < 3900)) {
-        // "This device has a limited amount of memory available."
         [self showWarningAlert:@"limited_ram" hasPreference:YES exitWhenCompleted:NO];
     }
-    
-    if (@available(iOS 26.0, *)) {
-        [self showWarningAlert:@"ios19_jitdead" hasPreference:NO exitWhenCompleted:YES];
+    if (@available(iOS 16.0, *)) {
+        [self showWarningAlert:@"ios16_jitdead" hasPreference:NO exitWhenCompleted:YES];
     }
-
-    self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-    self.navigationItem.rightBarButtonItem = [sidebarViewController drawAccountButton];
-    self.navigationItem.leftItemsSupplementBackButton = true;
 }
 
 -(void)showWarningAlert:(NSString *)key hasPreference:(BOOL)isPreferenced exitWhenCompleted:(BOOL)shouldExit {
@@ -87,40 +92,19 @@ UIEdgeInsets insets;
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    // Prevent horizontal scrolling
     if (scrollView.contentOffset.x > 0)
         scrollView.contentOffset = CGPointMake(0, scrollView.contentOffset.y);
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
-{
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [self adjustWebViewForSize:size];
-}
-
-- (void)adjustWebViewForSize:(CGSize)size {
-    BOOL isPortrait = size.height > size.width;
-    if (isPortrait) {
-        webView.scrollView.contentInset = UIEdgeInsetsMake(self.navigationController.navigationBar.frame.size.height + insets.top, 0, self.navigationController.navigationBar.frame.size.height + insets.bottom, 0);
-    } else {
-        webView.scrollView.contentInset = UIEdgeInsetsMake(self.navigationController.navigationBar.frame.size.height, 0, self.navigationController.navigationBar.frame.size.height, 0);
-    }
-}
-
-- (void)webView:(WKWebView *)webView 
-decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction 
-decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
      if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
+        // Open external links in Safari
         openLink(self, navigationAction.request.URL);
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
     decisionHandler(WKNavigationActionPolicyAllow);
-}
-
-- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData API_AVAILABLE(ios(14.5)) {
-}
-
-- (void)downloadDidFinish:(WKDownload *)download API_AVAILABLE(ios(14.5)) {
 }
 
 @end

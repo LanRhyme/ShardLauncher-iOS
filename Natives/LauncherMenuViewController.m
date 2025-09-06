@@ -42,8 +42,8 @@
 
 @interface LauncherMenuViewController()
 @property(nonatomic) NSMutableArray<LauncherMenuCustomItem*> *options;
-@property(nonatomic) UILabel *statusLabel;
 @property(nonatomic) int lastSelectedIndex;
+@property(nonatomic) BOOL isSidebarCollapsed;
 @end
 
 @implementation LauncherMenuViewController
@@ -54,11 +54,15 @@
     [super viewDidLoad];
     
     self.isInitialVc = YES;
+    self.isSidebarCollapsed = YES; // Start collapsed
     
-    UIImageView *titleView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"AppLogo"]];
-    [titleView setContentMode:UIViewContentModeScaleAspectFit];
-    self.navigationItem.titleView = titleView;
-    [titleView sizeToFit];
+    // Remove title view, as it takes up space
+    self.navigationItem.titleView = nil;
+    self.navigationItem.title = @"";
+
+    // Add expand/collapse button
+    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"sidebar.right"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
+    self.navigationItem.leftBarButtonItem = toggleButton;
     
     self.options = @[
         [LauncherMenuCustomItem vcClass:LauncherNewsViewController.class],
@@ -80,82 +84,12 @@
         [contentNavigationController performSelector:@selector(enterModInstaller)];
     }]];
     
-    // TODO: Finish log-uploading service integration
-    [self.options addObject:
-     (id)[LauncherMenuCustomItem
-          title:localize(@"login.menu.sendlogs", nil)
-          imageName:@"square.and.arrow.up" action:^{
-        NSString *latestlogPath = [NSString stringWithFormat:@"file://%s/latestlog.old.txt", getenv("POJAV_HOME")];
-        NSLog(@"Path is %@", latestlogPath);
-        UIActivityViewController *activityVC;
-        if (realUIIdiom != UIUserInterfaceIdiomTV) {
-            activityVC = [[UIActivityViewController alloc]
-                          initWithActivityItems:@[[NSURL URLWithString:latestlogPath]]
-                          applicationActivities:nil];
-        } else {
-            dlopen("/System/Library/PrivateFrameworks/SharingUI.framework/SharingUI", RTLD_GLOBAL);
-            activityVC =
-            [[NSClassFromString(@"SFAirDropSharingViewControllerTV") alloc]
-             performSelector:@selector(initWithSharingItems:)
-             withObject:@[[NSURL URLWithString:latestlogPath]]];
-        }
-        activityVC.popoverPresentationController.sourceView = titleView;
-        activityVC.popoverPresentationController.sourceRect = titleView.bounds;
-        [self presentViewController:activityVC animated:YES completion:nil];
-    }]];
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"MM-dd";
-    NSString* date = [dateFormatter stringFromDate:NSDate.date];
-    if([date isEqualToString:@"06-29"] || [date isEqualToString:@"06-30"] || [date isEqualToString:@"07-01"]) {
-        [self.options addObject:(id)[LauncherMenuCustomItem
-                                     title:@"Technoblade never dies!"
-                                     imageName:@"" action:^{
-            openLink(self, [NSURL URLWithString:@"https://youtu.be/DPMluEVUqS0"]);
-        }]];
-    }
-    
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
-    self.navigationController.toolbarHidden = NO;
-    UIActivityIndicatorViewStyle indicatorStyle = UIActivityIndicatorViewStyleMedium;
-    UIActivityIndicatorView *toolbarIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:indicatorStyle];
-    [toolbarIndicator startAnimating];
-    self.toolbarItems = @[
-        [[UIBarButtonItem alloc] initWithCustomView:toolbarIndicator],
-        [[UIBarButtonItem alloc] init]
-    ];
-    self.toolbarItems[1].tintColor = UIColor.labelColor;
-    
-    // Setup the account button
-    self.accountBtnItem = [self drawAccountButton];
-    
-    [self updateAccountInfo];
+    self.navigationController.toolbarHidden = YES; // Hide the old toolbar
     
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
     [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
-    
-    if (getEntitlementValue(@"get-task-allow")) {
-        [self displayProgress:localize(@"login.jit.checking", nil)];
-        if (isJITEnabled(false)) {
-            [self displayProgress:localize(@"login.jit.enabled", nil)];
-            [self displayProgress:nil];
-        } else {
-            [self enableJITWithAltKit];
-        }
-    } else if (!NSProcessInfo.processInfo.macCatalystApp && !getenv("SIMULATOR_DEVICE_NAME")) {
-        [self displayProgress:localize(@"login.jit.fail", nil)];
-        [self displayProgress:nil];
-        UIAlertController* alert = [UIAlertController alertControllerWithTitle:localize(@"login.jit.fail.title", nil)
-            message:localize(@"login.jit.fail.description_unsupported", nil)
-            preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction* okAction = [UIAlertAction actionWithTitle:localize(@"OK", nil) style:UIAlertActionStyleDefault handler:^(id action){
-            exit(-1);
-        }];
-        [alert addAction:okAction];
-        [self presentViewController:alert animated:YES completion:nil];
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -163,25 +97,24 @@
     [self restoreHighlightedSelection];
 }
 
-- (UIBarButtonItem *)drawAccountButton {
-    if (!self.accountBtnItem) {
-        self.accountButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.accountButton addTarget:self action:@selector(selectAccount:) forControlEvents:UIControlEventPrimaryActionTriggered];
-        self.accountButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-
-        self.accountButton.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4);
-        self.accountButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.accountButton.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
-        self.accountBtnItem = [[UIBarButtonItem alloc] initWithCustomView:self.accountButton];
-    }
-
-    [self updateAccountInfo];
+- (void)toggleSidebar:(id)sender {
+    self.isSidebarCollapsed = !self.isSidebarCollapsed;
     
-    return self.accountBtnItem;
+    // Animate the width change
+    [UIView animateWithDuration:0.3 animations:^{
+        self.splitViewController.preferredPrimaryColumnWidth = self.isSidebarCollapsed ? 80 : 240;
+    }];
+    
+    // Update button icon
+    NSString *iconName = self.isSidebarCollapsed ? @"sidebar.right" : @"sidebar.left";
+    ((UIBarButtonItem *)sender).image = [UIImage systemImageNamed:iconName];
+    
+    // Reload table to show/hide text
+    [self.tableView reloadData];
+    [self restoreHighlightedSelection];
 }
 
 - (void)restoreHighlightedSelection {
-    // Restore the selected row when the view appears again
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.lastSelectedIndex inSection:0];
     [self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
@@ -198,26 +131,30 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     }
 
-    cell.textLabel.text = [self.options[indexPath.row] title];
-    
-    UIImage *origImage = [UIImage systemImageNamed:[self.options[indexPath.row]
-        performSelector:@selector(imageName)]];
-    if (origImage) {
-        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(40, 40)];
-        UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext) {
-            CGFloat scaleFactor = 40/origImage.size.height;
-            [origImage drawInRect:CGRectMake(20 - origImage.size.width*scaleFactor/2, 0, origImage.size.width*scaleFactor, 40)];
-        }];
-        cell.imageView.image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    // Show/hide text based on collapsed state
+    if (self.isSidebarCollapsed) {
+        cell.textLabel.text = @"";
+    } else {
+        cell.textLabel.text = [self.options[indexPath.row] title];
     }
     
-    if (cell.imageView.image == nil) {
-        cell.imageView.layer.magnificationFilter = kCAFilterNearest;
-        cell.imageView.layer.minificationFilter = kCAFilterNearest;
-        cell.imageView.image = [UIImage imageNamed:[self.options[indexPath.row]
-            performSelector:@selector(imageName)]];
-        cell.imageView.image = [cell.imageView.image _imageWithSize:CGSizeMake(40, 40)];
+    // Use a dynamic color for the icons
+    UIColor *iconColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            return [UIColor colorWithRed:0.4 green:0.8 blue:0.4 alpha:1.0]; // Deep Green
+        } else {
+            return [UIColor colorWithRed:0.6 green:1.0 blue:0.6 alpha:1.0]; // Light Green
+        }
+    }];
+    
+    UIImage *origImage = [UIImage imageNamed:[self.options[indexPath.row] imageName]];
+    if (!origImage) {
+        origImage = [UIImage systemImageNamed:[self.options[indexPath.row] imageName]];
     }
+    
+    cell.imageView.image = [origImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    cell.imageView.tintColor = iconColor;
+    
     return cell;
 }
 
@@ -227,147 +164,27 @@
     
     if (selected.action != nil) {
         [self restoreHighlightedSelection];
-        ((LauncherMenuCustomItem *)selected).action();
+        selected.action();
     } else {
         if(self.isInitialVc) {
             self.isInitialVc = NO;
         } else {
             self.options[self.lastSelectedIndex].vcArray = contentNavigationController.viewControllers;
-            [contentNavigationController setViewControllers:selected.vcArray animated:NO];
-            self.lastSelectedIndex = indexPath.row;
+            
+            // Animate the view controller transition
+            [UIView transitionWithView:contentNavigationController.view
+                              duration:0.3
+                               options:UIViewAnimationOptionTransitionCrossDissolve
+                            animations:^{
+                                [contentNavigationController setViewControllers:selected.vcArray animated:NO];
+                            } completion:nil];
+
+            self.lastSelectedIndex = (int)indexPath.row;
         }
-        selected.vcArray[0].navigationItem.rightBarButtonItem = self.accountBtnItem;
-        selected.vcArray[0].navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-        selected.vcArray[0].navigationItem.leftItemsSupplementBackButton = true;
     }
 }
 
-- (void)selectAccount:(UIButton *)sender {
-    AccountListViewController *vc = [[AccountListViewController alloc] init];
-    vc.whenDelete = ^void(NSString* name) {
-        if ([name isEqualToString:getPrefObject(@"internal.selected_account")]) {
-            BaseAuthenticator.current = nil;
-            setPrefObject(@"internal.selected_account", @"");
-            [self updateAccountInfo];
-        }
-    };
-    vc.whenItemSelected = ^void() {
-        setPrefObject(@"internal.selected_account", BaseAuthenticator.current.authData[@"username"]);
-        [self updateAccountInfo];
-        if (sender != self.accountButton) {
-            // Called from the play button, so call back to continue
-            [sender sendActionsForControlEvents:UIControlEventPrimaryActionTriggered];
-        }
-    };
-    vc.modalPresentationStyle = UIModalPresentationPopover;
-    vc.preferredContentSize = CGSizeMake(350, 250);
-
-    UIPopoverPresentationController *popoverController = vc.popoverPresentationController;
-    popoverController.sourceView = sender;
-    popoverController.sourceRect = sender.bounds;
-    popoverController.permittedArrowDirections = UIPopoverArrowDirectionAny;
-    popoverController.delegate = vc;
-    [self presentViewController:vc animated:YES completion:nil];
-}
-
-- (void)updateAccountInfo {
-    NSDictionary *selected = BaseAuthenticator.current.authData;
-    CGSize size = CGSizeMake(contentNavigationController.view.frame.size.width, contentNavigationController.view.frame.size.height);
-    
-    if (selected == nil) {
-        if((size.width / 3) > 200) {
-            [self.accountButton setAttributedTitle:[[NSAttributedString alloc] initWithString:localize(@"login.option.select", nil)] forState:UIControlStateNormal];
-        } else {
-            [self.accountButton setAttributedTitle:(NSAttributedString *)@"" forState:UIControlStateNormal];
-        }
-        [self.accountButton setImage:[UIImage imageNamed:@"DefaultAccount"] forState:UIControlStateNormal];
-        [self.accountButton sizeToFit];
-        return;
-    }
-
-    // Remove the prefix "Demo." if there is
-    BOOL isDemo = [selected[@"username"] hasPrefix:@"Demo."];
-    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:[selected[@"username"] substringFromIndex:(isDemo?5:0)]];
-
-    // Check if we're switching between demo and full mode
-    BOOL shouldUpdateProfiles = (getenv("DEMO_LOCK")!=NULL) != isDemo;
-
-    // Reset states
-    unsetenv("DEMO_LOCK");
-    setenv("POJAV_GAME_DIR", [NSString stringWithFormat:@"%s/Library/Application Support/minecraft", getenv("POJAV_HOME")].UTF8String, 1);
-
-    id subtitle;
-    if (isDemo) {
-        subtitle = localize(@"login.option.demo", nil);
-        setenv("DEMO_LOCK", "1", 1);
-        setenv("POJAV_GAME_DIR", [NSString stringWithFormat:@"%s/.demo", getenv("POJAV_HOME")].UTF8String, 1);
-    } else if (selected[@"xboxGamertag"] == nil) {
-        subtitle = localize(@"login.option.local", nil);
-    } else {
-        // Display the Xbox gamertag for online accounts
-        subtitle = selected[@"xboxGamertag"];
-    }
-
-    subtitle = [[NSAttributedString alloc] initWithString:subtitle attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
-    [title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:nil]];
-    [title appendAttributedString:subtitle];
-    
-    if((size.width / 3) > 200) {
-        [self.accountButton setAttributedTitle:title forState:UIControlStateNormal];
-    } else {
-        [self.accountButton setAttributedTitle:(NSAttributedString *)@"" forState:UIControlStateNormal];
-    }
-    
-    // TODO: Add caching mechanism for profile pictures
-    NSURL *url = [NSURL URLWithString:[selected[@"profilePicURL"] stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"]];
-    UIImage *placeholder = [UIImage imageNamed:@"DefaultAccount"];
-    [self.accountButton setImageForState:UIControlStateNormal withURL:url placeholderImage:placeholder];
-    [self.accountButton.imageView setImageWithURL:url placeholderImage:placeholder];
-    [self.accountButton sizeToFit];
-
-    // Update profiles and local version list if needed
-    if (shouldUpdateProfiles) {
-        [contentNavigationController fetchLocalVersionList];
-        [contentNavigationController performSelector:@selector(reloadProfileList)];
-    }
-
-    // Update tableView whenever we have
-    UITableViewController *tableVC = contentNavigationController.viewControllers.lastObject;
-    if ([tableVC isKindOfClass:UITableViewController.class]) {
-        [tableVC.tableView reloadData];
-    }
-}
-
-- (void)displayProgress:(NSString *)status {
-    if (status == nil) {
-        [(UIActivityIndicatorView *)self.toolbarItems[0].customView stopAnimating];
-    } else {
-        self.toolbarItems[1].title = status;
-    }
-}
-
-- (void)enableJITWithAltKit {
-    [ALTServerManager.sharedManager startDiscovering];
-    [ALTServerManager.sharedManager autoconnectWithCompletionHandler:^(ALTServerConnection *connection, NSError *error) {
-        if (error) {
-            NSLog(@"[AltKit] Could not auto-connect to server. %@", error.localizedRecoverySuggestion);
-            [self displayProgress:localize(@"login.jit.fail", nil)];
-            [self displayProgress:nil];
-        }
-        [connection enableUnsignedCodeExecutionWithCompletionHandler:^(BOOL success, NSError *error) {
-            if (success) {
-                NSLog(@"[AltKit] Successfully enabled JIT compilation!");
-                [ALTServerManager.sharedManager stopDiscovering];
-                [self displayProgress:localize(@"login.jit.enabled", nil)];
-                [self displayProgress:nil];
-            } else {
-                NSLog(@"[AltKit] Error enabling JIT: %@", error.localizedRecoverySuggestion);
-                [self displayProgress:localize(@"login.jit.fail", nil)];
-                [self displayProgress:nil];
-            }
-            [connection disconnect];
-        }];
-    }];
-}
+// Removed drawAccountButton, updateAccountInfo, selectAccount as they are moved to RightPaneViewController
+// Removed JIT-related code as it's not relevant to the menu UI itself
 
 @end
