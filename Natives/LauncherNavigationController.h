@@ -10,6 +10,7 @@ NSMutableArray<NSDictionary *> *localVersionList, *remoteVersionList;
 
 - (void)enterModInstallerWithPath:(NSString *)path hitEnterAfterWindowShown:(BOOL)hitEnter;
 - (void)fetchLocalVersionList;
+- (void)reloadProfileList;
 - (void)setInteractionEnabled:(BOOL)enable forDownloading:(BOOL)downloading;
 
 @end

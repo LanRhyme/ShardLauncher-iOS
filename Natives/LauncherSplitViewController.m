@@ -4,6 +4,7 @@
 #import "LauncherNavigationController.h"
 #import "LauncherPreferences.h"
 #import "utils.h"
+#import "UIKit+hook.h" // Import for _imageWithSize:
 
 // Forward declarations for classes used in RightPaneViewController
 #import "authenticator/BaseAuthenticator.h"
@@ -12,7 +13,6 @@
 #import "PickTextField.h"
 #import "PLPickerView.h"
 #import "UIImageView+AFNetworking.h"
-#import "LauncherNavigationController.h"
 
 // MARK: - RightPaneViewController Definition
 
@@ -39,9 +39,10 @@
 
     [self setupUI];
     [self updateAccountInfo];
-    [self reloadProfileList];
     
-    // Observe account changes
+    // The content controller is responsible for loading the profile list initially.
+    // We just need to reload the picker view once it's done.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadProfileList) name:@"ProfileListChanged" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAccountInfo) name:@"AuthInfoChanged" object:nil];
 }
 
@@ -191,13 +192,11 @@
         if ([name isEqualToString:getPrefObject(@"internal.selected_account")]) {
             BaseAuthenticator.current = nil;
             setPrefObject(@"internal.selected_account", @"");
-            [self updateAccountInfo];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"AuthInfoChanged" object:nil];
         }
     };
     vc.whenItemSelected = ^void() {
         setPrefObject(@"internal.selected_account", BaseAuthenticator.current.authData[@"username"]);
-        [self updateAccountInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"AuthInfoChanged" object:nil];
     };
     vc.modalPresentationStyle = UIModalPresentationPopover;
@@ -220,17 +219,12 @@
 }
 
 - (void)launchGame:(UIButton *)sender {
-    // This logic is complex and resides in LauncherNavigationController.
-    // We will get the content controller and call its launch method.
     LauncherNavigationController *contentNav = self.splitViewController.viewControllers[1];
     [contentNav performSelector:@selector(performInstallOrShowDetails:) withObject:sender];
 }
 
 - (void)reloadProfileList {
-    LauncherNavigationController *contentNav = self.splitViewController.viewControllers[1];
-    [contentNav reloadProfileList]; // Ask the content controller to reload profiles data
     [self.profilePickerView reloadAllComponents];
-    
     NSInteger selectedRow = [PLProfiles.current.profiles.allKeys indexOfObject:PLProfiles.current.selectedProfileName];
     if (selectedRow != NSNotFound) {
         [self.profilePickerView selectRow:selectedRow inComponent:0 animated:NO];
@@ -258,9 +252,9 @@
     self.profileTextField.text = [self pickerView:pickerView titleForRow:row forComponent:component];
     PLProfiles.current.selectedProfileName = self.profileTextField.text;
     
-    // Update profile icon
+    // Update profile icon using the correct method
     UIImageView *iconView = (UIImageView *)self.profileTextField.leftView;
-    [pickerView enumerateImageView:iconView forRow:row forComponent:component];
+    iconView.image = [pickerView imageAtRow:row column:component];
 }
 
 - (void)pickerView:(PLPickerView *)pickerView enumerateImageView:(UIImageView *)imageView forRow:(NSInteger)row forComponent:(NSInteger)component {
@@ -303,13 +297,12 @@
     self.preferredSplitBehavior = UISplitViewControllerSplitBehaviorTile;
     if (@available(iOS 14.0, *)) {
         self.preferredDisplayMode = UISplitViewControllerDisplayModeTwoBesideSecondary;
+        // Right pane is 30% of the width
+        self.preferredSecondaryColumnWidth = self.view.bounds.size.width * 0.3;
     }
     
-    // Right pane is 30% of the width
-    self.preferredSecondaryColumnWidth = self.view.bounds.size.width * 0.3;
     // Left menu is a fixed-width icon bar
     self.preferredPrimaryColumnWidth = 80;
-    // The rest is for the content view
     self.primaryEdge = UISplitViewControllerPrimaryEdgeLeading;
 }
 

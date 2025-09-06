@@ -169,15 +169,9 @@ static void *ProgressObserverContext = &ProgressObserverContext;
     [self fetchLocalVersionList];
     // Reload launcher_profiles.json
     [PLProfiles updateCurrent];
-    [self.versionPickerView reloadAllComponents];
-    // Reload selected profile info
-    self.profileSelectedAt = [PLProfiles.current.profiles.allKeys indexOfObject:PLProfiles.current.selectedProfileName];
-    if (self.profileSelectedAt == -1) {
-        // This instance has no profiles?
-        return;
-    }
-    [self.versionPickerView selectRow:self.profileSelectedAt inComponent:0 animated:NO];
-    [self pickerView:self.versionPickerView didSelectRow:self.profileSelectedAt inComponent:0];
+    
+    // Notify the right pane to update its picker view
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ProfileListChanged" object:nil];
 }
 
 #pragma mark - Options
@@ -325,18 +319,19 @@ static void *ProgressObserverContext = &ProgressObserverContext;
         self.progressText.text = progress.localizedAdditionalDescription;
 
         if (!progress.finished) return;
-        [self.progressVC dismissModalViewControllerAnimated:NO];
 
-        self.progressViewMain.observedProgress = nil;
-        if (self.task.metadata) {
-            [self invokeAfterJITEnabled:^{
-                UIKit_launchMinecraftSurfaceVC(self.view.window, self.task.metadata);
-            }];
-        } else {
-            [self reloadProfileList];
-        }
-        self.task = nil;
-        [self setInteractionEnabled:YES forDownloading:YES];
+        [self.progressVC dismissViewControllerAnimated:NO completion:^{
+            self.progressViewMain.observedProgress = nil;
+            if (self.task.metadata) {
+                [self invokeAfterJITEnabled:^{
+                    UIKit_launchMinecraftSurfaceVC(self.view.window, self.task.metadata);
+                }];
+            } else {
+                [self reloadProfileList];
+            }
+            self.task = nil;
+            [self setInteractionEnabled:YES forDownloading:YES];
+        }];
     });
 }
 
@@ -435,7 +430,7 @@ static void *ProgressObserverContext = &ProgressObserverContext;
     return PLProfiles.current.profiles.allValues[row][@"name"];
 }
 
-- (void)pickerView:(UIPickerView *)pickerView enumerateImageView:(UIImageView *)imageView forRow:(NSInteger)row forComponent:(NSInteger)component {
+- (void)pickerView:(PLPickerView *)pickerView enumerateImageView:(UIImageView *)imageView forRow:(NSInteger)row forComponent:(NSInteger)component {
     UIImage *fallbackImage = [[UIImage imageNamed:@"DefaultProfile"] _imageWithSize:CGSizeMake(40, 40)];
     NSString *urlString = PLProfiles.current.profiles.allValues[row][@"icon"];
     [imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:fallbackImage];
@@ -454,7 +449,8 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    [sidebarViewController updateAccountInfo];
+    // This call is no longer valid as the account button is in the right pane.
+    // [sidebarViewController updateAccountInfo];
 }
 
 - (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(nullable NSData *)resumeData API_AVAILABLE(ios(14.5)) {
