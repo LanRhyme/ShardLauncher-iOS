@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 添加模拟器测试构建" />
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 添加模拟器测试构建">
+      <change beforePath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Natives/ios_uikit_bridge.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/ios_uikit_bridge.m" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

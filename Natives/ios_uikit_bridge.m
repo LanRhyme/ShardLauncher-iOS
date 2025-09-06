@@ -146,7 +146,7 @@ void UIKit_returnToSplitView() {
                 window.rootViewController = tmpRootVC;
                 tmpRootVC = nil;
             } else {
-                window.rootViewController = [[LauncherSplitViewController alloc] initWithStyle:UISplitViewControllerStyleDoubleColumn];
+                window.rootViewController = [[LauncherSplitViewController alloc] initWithStyle:UISplitViewControllerStyleTripleColumn];
             }
             [window makeKeyAndVisible];
         }];
@@ -154,7 +154,7 @@ void UIKit_returnToSplitView() {
 }
 
 void launchInitialViewController(UIWindow *window) {
-    window.rootViewController = [[LauncherSplitViewController alloc] initWithStyle:UISplitViewControllerStyleDoubleColumn];
+    window.rootViewController = [[LauncherSplitViewController alloc] initWithStyle:UISplitViewControllerStyleTripleColumn];
 #if 0
     if (getPrefBool(@"internal.internal_launch_on_boot")) {
         window.rootViewController = [[SurfaceViewController alloc] init];
