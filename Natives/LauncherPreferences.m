@@ -68,7 +68,6 @@ CGRect getSafeArea(CGRect screenBounds) {
 
 void setSafeArea(CGSize screenSize, CGRect frame) {
     UIEdgeInsets safeArea;
-    // TODO: make safe area consistent across opposite orientations?
     if (screenSize.width < screenSize.height) {
         safeArea = UIEdgeInsetsMake(
             frame.origin.x,
@@ -86,7 +85,22 @@ void setSafeArea(CGSize screenSize, CGRect frame) {
 }
 
 UIEdgeInsets getDefaultSafeArea() {
-    UIEdgeInsets safeArea = UIApplication.sharedApplication.windows.firstObject.safeAreaInsets;
+    UIEdgeInsets safeArea = UIEdgeInsetsZero;
+    if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in [[UIApplication sharedApplication] connectedScenes]) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                safeArea = windowScene.windows.firstObject.safeAreaInsets;
+                break;
+            }
+        }
+    } else {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        safeArea = UIApplication.sharedApplication.keyWindow.safeAreaInsets;
+        #pragma clang diagnostic pop
+    }
+    
     CGSize screenSize = UIScreen.mainScreen.bounds.size;
     if (screenSize.width < screenSize.height) {
         safeArea.left = safeArea.top;
@@ -146,7 +160,6 @@ NSArray* getRendererKeys(BOOL containsDefault) {
 
 #if CONFIG_RELEASE
     if(@available(iOS 16.0, *)) {
-        // Disabling Zink on iOS 16.0+ to figure out what's wrong with it
     } else {
 #endif
         [array addObject:@ RENDERER_NAME_VK_ZINK];
@@ -161,7 +174,6 @@ NSArray* getRendererNames(BOOL containsDefault) {
 
 #if CONFIG_RELEASE
     if(@available(iOS 16.0, *)) {
-        // Disabling Zink on iOS 16.0+ to figure out what's wrong with it
         array = @[
             localize(@"preference.title.renderer.release.auto", nil),
             localize(@"preference.title.renderer.release.gl4es", nil),

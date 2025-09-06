@@ -208,7 +208,6 @@
             }
             return;
         }
-        // NSLog(@"URL returned = %@", [callbackURL absoluteString]);
 
         NSDictionary *queryItems = [self parseQueryItems:callbackURL.absoluteString];
         if (queryItems[@"code"]) {
@@ -228,7 +227,6 @@
             [[[MicrosoftAuthenticator alloc] initWithInput:queryItems[@"code"]] loginWithCallback:callback];
         } else {
             if ([queryItems[@"error"] hasPrefix:@"access_denied"]) {
-                // Ignore access denial responses
                 return;
             }
             showDialog(localize(@"Error", nil), queryItems[@"error_description"]);
@@ -285,7 +283,17 @@
 
 #pragma mark - ASWebAuthenticationPresentationContextProviding
 - (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:(ASWebAuthenticationSession *)session {
-    return UIApplication.sharedApplication.windows.firstObject;
+    if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in [[UIApplication sharedApplication] connectedScenes]) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                return [(UIWindowScene *)scene windows].firstObject;
+            }
+        }
+    }
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return [[UIApplication sharedApplication] keyWindow];
+    #pragma clang diagnostic pop
 }
 
 @end

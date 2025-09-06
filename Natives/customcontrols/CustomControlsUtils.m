@@ -65,12 +65,10 @@ static int computeStrokeWidth(float widthInPercent, float width, float height) {
 }
 
 void convertV3_4Layout(NSMutableDictionary* dict) {
-    // Convert the layout stroke width to the V5 form
     for (NSMutableDictionary *button in (NSMutableArray *)dict[@"mControlDataList"]) {
         button[@"strokeWidth"] = @(computeStrokeWidth([button[@"strokeWidth"] intValue], [button[@"width"] intValue], [button[@"height"] intValue]));
     }
 
-    // Add default values
     for (NSString *key in @[@"mControlDataList", @"mDrawerDataList"]) {
         for (NSMutableDictionary *button in (NSMutableArray *)dict[key]) {
             button[@"displayInGame"] = @YES;
@@ -84,9 +82,19 @@ void convertV3_4Layout(NSMutableDictionary* dict) {
 void convertV2Layout(NSMutableDictionary* dict) {
     CGRect screenBounds = [[UIScreen mainScreen] bounds];
     CGFloat screenScale = [[UIScreen mainScreen] scale];
-    UIEdgeInsets insets = UIApplication.sharedApplication.windows.firstObject.safeAreaInsets;
+    
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 13.0, *)) {
+        UIWindow *keyWindow = [[[UIApplication sharedApplication] connectedScenes] allObjects][0].windows.firstObject;
+        if (keyWindow) insets = keyWindow.safeAreaInsets;
+    } else {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+        if (keyWindow) insets = keyWindow.safeAreaInsets;
+        #pragma clang diagnostic pop
+    }
 
-    // width: offset the notch parts
     CGFloat screenWidth = (screenBounds.size.width - insets.left - insets.right) * screenScale;
 
     for (NSMutableDictionary *button in (NSMutableArray *)dict[@"mControlDataList"]) {
@@ -116,49 +124,37 @@ void convertV1Layout(NSMutableDictionary* dict) {
         NSMutableArray *keycodes = [NSMutableArray arrayWithCapacity:4];
         CGFloat scale = [dict[@"scaledAt"] floatValue];
 
-        // default values
         btnDict[@"bgColor"] = @(0x4d000000);
         btnDict[@"strokeWidth"] = @(0);
-
-        // opacity -> reverse transparency
         btnDict[@"opacity"] = @((100.0 - [btnDict[@"transparency"] intValue]) / 100.0);
         [btnDict removeObjectForKey:@"transparency"];
-
-        // pixel of width, height -> dp
         btnDict[@"width"] = @([btnDict[@"width"] floatValue] / scale * 50.0);
         btnDict[@"height"] = @([btnDict[@"height"] floatValue] / scale * 50.0);
 
-        // isRound -> cornerRadius 35%
         if ([btnDict[@"isRound"] boolValue] == YES) {
             btnDict[@"cornerRadius"] = @(35.0f);
         }
         [btnDict removeObjectForKey:@"isRound"];
 
-        // keycode -> keycodes[0]
         [keycodes addObject:btnDict[@"keycode"]];
         [btnDict removeObjectForKey:@"keycode"];
 
-        // alt -> keycodes[i++]
         if ([dict[@"holdAlt"] boolValue] == YES) {
             [keycodes addObject:@(GLFW_KEY_LEFT_ALT)];
         }
         [btnDict removeObjectForKey:@"holdAlt"];
 
-        // ctrl -> keycodes[i++]
         if ([dict[@"holdCtrl"] boolValue] == YES) {
             [keycodes addObject:@(GLFW_KEY_LEFT_CONTROL)];
         }
         [btnDict removeObjectForKey:@"holdCtrl"];
 
-        // shift -> keycodes[i++]
         if ([dict[@"holdShift"] boolValue] == YES) {
             [keycodes addObject:@(GLFW_KEY_LEFT_SHIFT)];
         }
         [btnDict removeObjectForKey:@"holdShift"];
 
-        // set final keycode array
         btnDict[@"keycodes"] = keycodes;
-
         btnDict[@"mDrawerDataList"] = [[NSMutableArray alloc] init];
     }
 
@@ -199,140 +195,35 @@ void generateAndSaveDefaultControl() {
         return;
     }
 
-    // Generate a v2.7 control
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     dict[@"version"] = @(5);
     dict[@"scaledAt"] = @(100);
     dict[@"mControlDataList"] = [NSMutableArray new];
     dict[@"mDrawerDataList"] = [NSMutableArray new];
     dict[@"mJoystickDataList"] = [NSMutableArray new];
-    [dict[@"mControlDataList"] addObject:createButton(@"Keyboard",
-        (int[]){SPECIALBTN_KEYBOARD,0,0,0},
-        @"${margin} * 3 + ${width} * 2",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"GUI",
-        (int[]){SPECIALBTN_TOGGLECTRL,0,0,0},
-        @"${margin}",
-        @"${bottom} - ${margin}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"PRI",
-        (int[]){SPECIALBTN_MOUSEPRI,0,0,0},
-        @"${margin}",
-        @"${screen_height} - ${margin} * 3 - ${height} * 3",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"SEC",
-        (int[]){SPECIALBTN_MOUSESEC,0,0,0},
-        @"${margin} * 3 + ${width} * 2",
-        @"${screen_height} - ${margin} * 3 - ${height} * 3",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Mouse",
-        (int[]){SPECIALBTN_VIRTUALMOUSE,0,0,0},
-        @"${right} - ${margin}",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Debug",
-        (int[]){GLFW_KEY_F3,0,0,0},
-        @"${margin}",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Chat",
-        (int[]){GLFW_KEY_T,0,0,0},
-        @"${margin} * 2 + ${width}",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Tab",
-        (int[]){GLFW_KEY_TAB,0,0,0},
-        @"${margin} * 4 + ${width} * 3",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Opti-Zoom",
-        (int[]){GLFW_KEY_C,0,0,0},
-        @"${margin} * 5 + ${width} * 4",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Offhand",
-        (int[]){GLFW_KEY_F,0,0,0},
-        @"${margin} * 6 + ${width} * 5",
-        @"${margin}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"3rd",
-        (int[]){GLFW_KEY_F5,0,0,0},
-        @"${margin}",
-        @"${margin} * 2 + ${height}",
-        BTN_RECT
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"▲",
-        (int[]){GLFW_KEY_W,0,0,0},
-        @"${margin} * 2 + ${width}",
-        @"${bottom} - ${margin} * 3 - ${height} * 2",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"◀",
-        (int[]){GLFW_KEY_A,0,0,0},
-        @"${margin}",
-        @"${bottom} - ${margin} * 2 - ${height}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"▼",
-        (int[]){GLFW_KEY_S,0,0,0},
-        @"${margin} * 2 + ${width}",
-        @"${bottom} - ${margin}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"▶",
-        (int[]){GLFW_KEY_D,0,0,0},
-        @"${margin} * 3 + ${width} * 2",
-        @"${bottom} - ${margin} * 2 - ${height}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Inv",
-        (int[]){GLFW_KEY_E,0,0,0},
-        @"${margin} * 3 + ${width} * 2",
-        @"${bottom} - ${margin}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"◇",
-        (int[]){GLFW_KEY_LEFT_SHIFT,0,0,0},
-        @"${margin} * 2 + ${width}",
-        @"${screen_height} - ${margin} * 2 - ${height} * 2",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"⬛",
-        (int[]){GLFW_KEY_SPACE,0,0,0},
-        @"${right} - ${margin} * 2 - ${width}",
-        @"${bottom} - ${margin} * 2 - ${height}",
-        BTN_SQUARE
-    )];
-    [dict[@"mControlDataList"] addObject:createButton(@"Esc",
-        (int[]){GLFW_KEY_ESCAPE,0,0,0},
-        @"${right} - ${margin}",
-        @"${bottom} - ${margin}",
-        BTN_RECT
-    )];
+    [dict[@"mControlDataList"] addObject:createButton(@"Keyboard", (int[]){SPECIALBTN_KEYBOARD,0,0,0}, @"${margin} * 3 + ${width} * 2", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"GUI", (int[]){SPECIALBTN_TOGGLECTRL,0,0,0}, @"${margin}", @"${bottom} - ${margin}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"PRI", (int[]){SPECIALBTN_MOUSEPRI,0,0,0}, @"${margin}", @"${screen_height} - ${margin} * 3 - ${height} * 3", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"SEC", (int[]){SPECIALBTN_MOUSESEC,0,0,0}, @"${margin} * 3 + ${width} * 2", @"${screen_height} - ${margin} * 3 - ${height} * 3", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Mouse", (int[]){SPECIALBTN_VIRTUALMOUSE,0,0,0}, @"${right} - ${margin}", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Debug", (int[]){GLFW_KEY_F3,0,0,0}, @"${margin}", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Chat", (int[]){GLFW_KEY_T,0,0,0}, @"${margin} * 2 + ${width}", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Tab", (int[]){GLFW_KEY_TAB,0,0,0}, @"${margin} * 4 + ${width} * 3", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Opti-Zoom", (int[]){GLFW_KEY_C,0,0,0}, @"${margin} * 5 + ${width} * 4", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Offhand", (int[]){GLFW_KEY_F,0,0,0}, @"${margin} * 6 + ${width} * 5", @"${margin}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"3rd", (int[]){GLFW_KEY_F5,0,0,0}, @"${margin}", @"${margin} * 2 + ${height}", BTN_RECT)];
+    [dict[@"mControlDataList"] addObject:createButton(@"▲", (int[]){GLFW_KEY_W,0,0,0}, @"${margin} * 2 + ${width}", @"${bottom} - ${margin} * 3 - ${height} * 2", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"◀", (int[]){GLFW_KEY_A,0,0,0}, @"${margin}", @"${bottom} - ${margin} * 2 - ${height}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"▼", (int[]){GLFW_KEY_S,0,0,0}, @"${margin} * 2 + ${width}", @"${bottom} - ${margin}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"▶", (int[]){GLFW_KEY_D,0,0,0}, @"${margin} * 3 + ${width} * 2", @"${bottom} - ${margin} * 2 - ${height}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Inv", (int[]){GLFW_KEY_E,0,0,0}, @"${margin} * 3 + ${width} * 2", @"${bottom} - ${margin}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"◇", (int[]){GLFW_KEY_LEFT_SHIFT,0,0,0}, @"${margin} * 2 + ${width}", @"${screen_height} - ${margin} * 2 - ${height} * 2", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"⬛", (int[]){GLFW_KEY_SPACE,0,0,0}, @"${right} - ${margin} * 2 - ${width}", @"${bottom} - ${margin} * 2 - ${height}", BTN_SQUARE)];
+    [dict[@"mControlDataList"] addObject:createButton(@"Esc", (int[]){GLFW_KEY_ESCAPE,0,0,0}, @"${right} - ${margin}", @"${bottom} - ${margin}", BTN_RECT)];
     NSOutputStream *os = [[NSOutputStream alloc] initToFileAtPath:defaultPath append:NO];
     [os open];
     [NSJSONSerialization writeJSONObject:dict toStream:os options:NSJSONWritingPrettyPrinted error:nil];
     [os close];
-
-/*
-    [dict[@"mControlDataList"] addObject:createButton(@"NAME",
-        {SPECIALBTN_KEYBOARD,0,0,0},
-        @"DYNAMICX",
-        @"DYNAMICY",
-        WIDTHHEIGHT
-    )];
-*/
 }
 
 void generateAndSaveDefaultControlForGamepad() {
@@ -348,23 +239,18 @@ void generateAndSaveDefaultControlForGamepad() {
     
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"bumper_left", GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, SPECIALBTN_SCROLLUP)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"bumper_right", GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, SPECIALBTN_SCROLLDOWN)];
-    
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"trigger_left", GLFW_GAMEPAD_BUTTON_LEFT_TRIGGER, SPECIALBTN_MOUSESEC)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"trigger_right", GLFW_GAMEPAD_BUTTON_RIGHT_TRIGGER, SPECIALBTN_MOUSEPRI)];
-    
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_back", GLFW_GAMEPAD_BUTTON_BACK, GLFW_KEY_TAB)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_start", GLFW_GAMEPAD_BUTTON_START, GLFW_KEY_ESCAPE)];
-    
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_a", GLFW_GAMEPAD_BUTTON_A, GLFW_KEY_SPACE)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_b", GLFW_GAMEPAD_BUTTON_B, GLFW_KEY_Q)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_x", GLFW_GAMEPAD_BUTTON_X, GLFW_KEY_E)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"named_y", GLFW_GAMEPAD_BUTTON_Y, GLFW_KEY_F)];
-    
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"dpad_up", GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_KEY_LEFT_SHIFT)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"dpad_down", GLFW_GAMEPAD_BUTTON_DPAD_DOWN, GLFW_KEY_O)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"dpad_left", GLFW_GAMEPAD_BUTTON_DPAD_LEFT, GLFW_KEY_J)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"dpad_right", GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, GLFW_KEY_K)];
-    
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"thumb_left", GLFW_GAMEPAD_BUTTON_LEFT_THUMB, GLFW_KEY_LEFT_CONTROL)];
     [dict[@"mGameMappingList"] addObject:createGamepadButton(@"thumb_right", GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, GLFW_KEY_LEFT_SHIFT)];
     
@@ -372,23 +258,18 @@ void generateAndSaveDefaultControlForGamepad() {
     
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"bumper_left", GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, SPECIALBTN_SCROLLUP)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"bumper_right", GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER, SPECIALBTN_SCROLLDOWN)];
-    
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"trigger_left", GLFW_GAMEPAD_BUTTON_LEFT_TRIGGER, GLFW_KEY_UNKNOWN)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"trigger_right", GLFW_GAMEPAD_BUTTON_RIGHT_TRIGGER, GLFW_KEY_UNKNOWN)];
-    
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_back", GLFW_GAMEPAD_BUTTON_BACK, GLFW_KEY_UNKNOWN)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_start", GLFW_GAMEPAD_BUTTON_START, GLFW_KEY_UNKNOWN)];
-    
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_a", GLFW_GAMEPAD_BUTTON_A, SPECIALBTN_MOUSEPRI)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_b", GLFW_GAMEPAD_BUTTON_B, GLFW_KEY_ESCAPE)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_x", GLFW_GAMEPAD_BUTTON_X, SPECIALBTN_MOUSESEC)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"named_y", GLFW_GAMEPAD_BUTTON_Y, GLFW_KEY_LEFT_SHIFT)];
-    
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"dpad_up", GLFW_GAMEPAD_BUTTON_DPAD_UP, GLFW_KEY_UNKNOWN)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"dpad_down", GLFW_GAMEPAD_BUTTON_DPAD_DOWN, GLFW_KEY_O)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"dpad_left", GLFW_GAMEPAD_BUTTON_DPAD_LEFT, GLFW_KEY_J)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"dpad_right", GLFW_GAMEPAD_BUTTON_DPAD_RIGHT, GLFW_KEY_K)];
-    
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"thumb_left", GLFW_GAMEPAD_BUTTON_LEFT_THUMB, GLFW_KEY_UNKNOWN)];
     [dict[@"mMenuMappingList"] addObject:createGamepadButton(@"thumb_right", GLFW_GAMEPAD_BUTTON_RIGHT_THUMB, GLFW_KEY_UNKNOWN)];
     
@@ -403,9 +284,7 @@ void loadControlObject(UIView* targetView, NSMutableDictionary* controlDictionar
 
     if (convertLayoutIfNecessary(controlDictionary)) {
         NSMutableArray *controlDataList = controlDictionary[@"mControlDataList"];
-        //setPrefObject(@"internal.internal_current_button_scale", controlDictionary[@"scaledAt"]);
         for (NSMutableDictionary *buttonDict in controlDataList) {
-            //APPLY_SCALE(buttonDict[@"strokeWidth"]);
             @try {
                 ControlButton *button = [ControlButton buttonWithProperties:buttonDict];
                 [targetView addSubview:button];
@@ -413,7 +292,6 @@ void loadControlObject(UIView* targetView, NSMutableDictionary* controlDictionar
             } @catch (NSException *exception) {
                 [errorString appendFormat:@"%@: %@\n", buttonDict[@"name"], exception.reason];
             }
-            //NSLog(@"DBG Added button=%@", button);
         }
 
         NSMutableArray *drawerDataList = controlDictionary[@"mDrawerDataList"];
@@ -426,7 +304,6 @@ void loadControlObject(UIView* targetView, NSMutableDictionary* controlDictionar
             }
             if (isControlModifiable) drawer.areButtonsVisible = YES;
             [targetView addSubview:drawer];
-            //NSLog(@"DBG Added drawer=%@", drawer);
 
             for (NSMutableDictionary *subButton in drawerData[@"buttonProperties"]) {
                 ControlSubButton *subView = [ControlSubButton buttonWithProperties:subButton];
@@ -481,15 +358,11 @@ void initKeycodeTable(NSMutableArray* keyCodeMap, NSMutableArray* keyValueMap) {
     addkey(HOME)
     addkey(ESCAPE)
 
-    // 0-9 keys
     addkey(0) addkey(1) addkey(2) addkey(3) addkey(4)
     addkey(5) addkey(6) addkey(7) addkey(8) addkey(9)
-    //addkey(POUND)
 
-    // Arrow keys
     addkey(DPAD_UP) addkey(DPAD_DOWN) addkey(DPAD_LEFT) addkey(DPAD_RIGHT)
 
-    // A-Z keys
     addkey(A) addkey(B) addkey(C) addkey(D) addkey(E)
     addkey(F) addkey(G) addkey(H) addkey(I) addkey(J)
     addkey(K) addkey(L) addkey(M) addkey(N) addkey(O)
@@ -500,11 +373,9 @@ void initKeycodeTable(NSMutableArray* keyCodeMap, NSMutableArray* keyValueMap) {
     addkey(COMMA)
     addkey(PERIOD)
 
-    // Alt keys
     addkey(LEFT_ALT)
     addkey(RIGHT_ALT)
 
-    // Shift keys
     addkey(LEFT_SHIFT)
     addkey(RIGHT_SHIFT)
 
@@ -520,12 +391,9 @@ void initKeycodeTable(NSMutableArray* keyCodeMap, NSMutableArray* keyValueMap) {
     addkey(BACKSLASH)
     addkey(SEMICOLON)
     addkey(SLASH)
-    //addkey(AT) //@
 
-    // Page keys
     addkey(PAGE_UP) addkey(PAGE_DOWN)
 
-    // Control keys
     addkey(LEFT_CONTROL)
     addkey(RIGHT_CONTROL)
 
@@ -533,12 +401,10 @@ void initKeycodeTable(NSMutableArray* keyCodeMap, NSMutableArray* keyValueMap) {
     addkey(PAUSE)
     addkey(INSERT)
 
-    // Fn keys
     addkey(F1) addkey(F2) addkey(F3) addkey(F4)
     addkey(F5) addkey(F6) addkey(F7) addkey(F8)
     addkey(F9) addkey(F10) addkey(F11) addkey(F12)
 
-    // Num keys
     addkey(NUM_LOCK)
     addkey(NUMPAD_0)
     addkey(NUMPAD_1) addkey(NUMPAD_2) addkey(NUMPAD_3)
@@ -552,12 +418,5 @@ void initKeycodeTable(NSMutableArray* keyCodeMap, NSMutableArray* keyValueMap) {
     addkey(NUMPAD_ENTER)
     addkey(NUMPAD_EQUAL)
 
-    //addkey(APOSTROPHE)
-    //addkey(WORLD_1) addkey(WORLD_2)
-    //addkey(END)
-    //addkey(SCROLL_LOCK) 
-    //addkey(PRINT_SCREEN)
-    //addkey(LEFT_SUPER) addkey(RIGHT_ENTER)
-    //addkey(MENU)
 #undef addkey
 }

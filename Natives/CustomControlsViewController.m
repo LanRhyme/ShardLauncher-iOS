@@ -37,7 +37,21 @@
     [self setNeedsUpdateOfScreenEdgesDeferringSystemGestures];
     [self setNeedsUpdateOfHomeIndicatorAutoHidden];
 
-    UIEdgeInsets insets = UIApplication.sharedApplication.windows.firstObject.safeAreaInsets;
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in [[UIApplication sharedApplication] connectedScenes]) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                insets = windowScene.keyWindow.safeAreaInsets;
+                break;
+            }
+        }
+    } else {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        insets = [UIApplication sharedApplication].keyWindow.safeAreaInsets;
+        #pragma clang diagnostic pop
+    }
 
     UILabel *guideLabel = [[UILabel alloc] initWithFrame:self.view.frame];
     guideLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -66,8 +80,6 @@
     self.navigationBar.items = @[navigationItem];
     self.navigationBar.translucent = YES;
     [self.view addSubview:self.navigationBar];
-
-    CGFloat buttonScale = getPrefFloat(@"control.button_scale") / 100.0;
 
     self.resizeView = [[ControlHandleView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
     self.resizeView.backgroundColor = self.view.tintColor;
@@ -106,11 +118,7 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)sender shouldReceiveTouch:(UITouch *)touch {
     return sender.view != self.view || !CGRectContainsPoint(self.resizeView.frame, [sender locationInView:self.view]);
 }
-/*
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)sender shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
-*/
+
 - (void)panControlArea:(UIPanGestureRecognizer *)sender {
     static CGPoint previous;
     if (sender.state == UIGestureRecognizerStateBegan) {
@@ -175,7 +183,6 @@
         self.ctrlView.frame = getSafeArea(self.view.frame);
     }
 
-    // Update dynamic position for each view
     for (UIView *view in self.ctrlView.subviews) {
         if ([view isKindOfClass:[ControlButton class]]) {
             [(ControlButton *)view update];
@@ -215,6 +222,8 @@
         return;
     }
 
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     UIMenuController *menuController = [UIMenuController sharedMenuController];
 
     if (![sender.view isKindOfClass:[ControlButton class]]) {
@@ -249,6 +258,7 @@
 
     self.resizeView.hidden = sender.view == self.ctrlView;
     [self setButtonMenuVisibleForView:sender.view];
+    #pragma clang diagnostic pop
 }
 
 - (void)actionMenuExit {
@@ -329,7 +339,6 @@
 }
 
 - (void)actionMenuSafeArea {
-    // Set _UIBarBackground alpha to 0.8
     self.navigationBar.subviews[0].alpha = 0.8;
 
     BOOL isCustom = ((UISegmentedControl *)self.navigationBar.items[0].titleView).selectedSegmentIndex == 2;
@@ -443,7 +452,6 @@
 }
 
 - (void)actionMenuBtnCopy {
-    // copy
 }
 
 - (void)actionMenuBtnDelete {
@@ -466,12 +474,16 @@
 - (void)setButtonMenuVisibleForView:(UIView *)view {
     self.resizeView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     self.resizeView.target = (ControlButton *)view;
+    
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     UIMenuController *menuController = [UIMenuController sharedMenuController];
     if (view) {
         [menuController showMenuFromView:view rect:self.selectedPoint];
     } else {
         [menuController hideMenu];
     }
+    #pragma clang diagnostic pop
     
     if (view) {
         CGPoint origin = [self.ctrlView convertPoint:view.frame.origin toView:self.view];
@@ -495,13 +507,11 @@
     if (sender.state != UIGestureRecognizerStateChanged) return;
     CGPoint translation = [sender translationInView:sender.view];
 
-    // Perform safe area resize
     CGRect targetFrame = self.ctrlView.frame;
     targetFrame.size.width += translation.x;
     targetFrame.size.height += translation.y;
     self.ctrlView.frame = targetFrame;
 
-    // Keep track of handle view location
     targetFrame = self.resizeView.frame;
     targetFrame.origin.x = CGRectGetMaxX(self.ctrlView.frame) - targetFrame.size.width;
     targetFrame.origin.y = CGRectGetMaxY(self.ctrlView.frame) - targetFrame.size.height;
@@ -518,11 +528,9 @@
 
     switch (sender.state) {
         case UIGestureRecognizerStateBegan: {
-            // Save old button frame
             origButtonRect = self.resizeView.target.frame;
         } break;
         case UIGestureRecognizerStateChanged: {
-            // Perform button resize
             width = MAX(10, [self.resizeView.target.properties[@"width"] floatValue] + translation.x);
             height = MAX(10, [self.resizeView.target.properties[@"height"] floatValue] + translation.y);
             self.resizeView.target.properties[@"width"] = @(width);
@@ -530,7 +538,6 @@
             [self.resizeView.target update];
             [sender setTranslation:CGPointZero inView:sender.view];
 
-            // Keep track of handle view location
             self.resizeView.frame = CGRectMake(CGRectGetMaxX(self.resizeView.target.frame), CGRectGetMaxY(self.resizeView.target.frame),
                 self.resizeView.frame.size.width, self.resizeView.frame.size.height);
         } break;
@@ -568,7 +575,6 @@
             self.resizeView.target = button;
         } break;
         case UIGestureRecognizerStateChanged: {
-            //button.center = CGPointMake(button.center.x + translation.x, button.center.y + translation.y);
             [button snapAndAlignX:clamp(button.frame.origin.x+translation.x, 0, self.ctrlView.frame.size.width - button.frame.size.width) Y:clamp(button.frame.origin.y+translation.y, 0, self.ctrlView.frame.size.height - button.frame.size.height)];
             [sender setTranslation:CGPointZero inView:button];
             self.resizeView.frame = CGRectMake(CGRectGetMaxX(button.frame), CGRectGetMaxY(button.frame), self.resizeView.frame.size.width, self.resizeView.frame.size.height);
@@ -677,10 +683,7 @@ CGFloat currentY;
     editPickToolbar.items = @[btnFlexibleSpace, editDoneButton];
 
     CGFloat width = blurView.frame.size.width - 10.0;
-    CGFloat height = blurView.frame.size.height - 10.0;
 
-
-    // Property: Name
     if (![self.targetButton isKindOfClass:ControlJoystick.class]) {
         UILabel *labelName = [self addLabel:localize(@"custom_controls.button_edit.name", nil)];
         self.editName = [[UITextField alloc] initWithFrame:CGRectMake(labelName.frame.size.width + 5.0, currentY, width - labelName.frame.size.width - 5.0, labelName.frame.size.height)];
@@ -695,9 +698,7 @@ CGFloat currentY;
 
     if (![self.targetButton isKindOfClass:ControlSubButton.class] ||
     [((ControlSubButton *)self.targetButton).parentDrawer.drawerData[@"orientation"] isEqualToString:@"FREE"]) {
-        // Property: Size
         UILabel *labelSize = [self addLabel:localize(@"custom_controls.button_edit.size", nil)];
-        // width / 2.0 + (labelSize.frame.size.width + 4.0) / 2.0
         CGFloat editSizeWidthValue = (width - labelSize.frame.size.width) / 2 - labelSize.frame.size.height / 2;
         UILabel *labelSizeX = [[UILabel alloc] initWithFrame:CGRectMake(labelSize.frame.size.width + editSizeWidthValue, labelSize.frame.origin.y, labelSize.frame.size.height, labelSize.frame.size.height)];
         labelSizeX.text = @"x";
@@ -725,7 +726,6 @@ CGFloat currentY;
 
 
     if ([self.targetButton isKindOfClass:ControlDrawer.class]) {
-        // Property: Orientation
         self.arrOrientation = @[@"DOWN", @"LEFT", @"UP", @"RIGHT", @"FREE"];
         UILabel *labelOrientation = [self addLabel:localize(@"custom_controls.button_edit.orientation", nil)];
         self.ctrlOrientation = [[UISegmentedControl alloc] initWithItems:self.arrOrientation];
@@ -736,14 +736,12 @@ CGFloat currentY;
         [self.scrollView addSubview:self.ctrlOrientation];
         currentY += labelOrientation.frame.size.height + 15.0;
     } else if ([self.targetButton isKindOfClass:ControlJoystick.class]) {
-        // Property: Forward lock
         UILabel *labelFwdLock = [self addLabel:localize(@"custom_controls.button_edit.forward_lock", nil)];
         self.switchFwdLock = [[UISwitch alloc] initWithFrame:CGRectMake(width - 62.0, currentY - 5.0, 50.0, 30)];
         [self.switchFwdLock setOn:[self.targetButton.properties[@"forwardLock"] boolValue] animated:NO];
         [self.scrollView addSubview:self.switchFwdLock];
         currentY += labelFwdLock.frame.size.height + 15.0;
     } else {
-        // Property: Mapping
         UILabel *labelMapping = [self addLabel:localize(@"custom_controls.button_edit.mapping", nil)];
 
         self.editMapping = [[UITextView alloc] initWithFrame:CGRectMake(0,0,1,1)];
@@ -769,7 +767,6 @@ CGFloat currentY;
 
 
     if (![self.targetButton isKindOfClass:ControlJoystick.class]) {
-        // Property: Toggleable
         UILabel *labelToggleable = [self addLabel:localize(@"custom_controls.button_edit.toggleable", nil)];
         self.switchToggleable = [[UISwitch alloc] initWithFrame:CGRectMake(width - 62.0, currentY - 5.0, 50.0, 30)];
         [self.switchToggleable setOn:[self.targetButton.properties[@"isToggle"] boolValue] animated:NO];
@@ -777,7 +774,6 @@ CGFloat currentY;
         currentY += labelToggleable.frame.size.height + 15.0;
 
 
-        // Property: Mouse pass
         UILabel *labelMousePass = [self addLabel:localize(@"custom_controls.button_edit.mouse_pass", nil)];
         self.switchMousePass = [[UISwitch alloc] initWithFrame:CGRectMake(width - 62.0, currentY - 5.0, 50.0, 30)];
         [self.switchMousePass setOn:[self.targetButton.properties[@"passThruEnabled"] boolValue]];
@@ -785,7 +781,6 @@ CGFloat currentY;
         currentY += labelMousePass.frame.size.height + 15.0;
 
 
-        // Property: Swipeable
         UILabel *labelSwipeable = [self addLabel:localize(@"custom_controls.button_edit.swipeable", nil)];
         self.switchSwipeable = [[UISwitch alloc] initWithFrame:CGRectMake(width - 62.0, currentY - 5.0, 50.0, 30)];
         [self.switchSwipeable setOn:[self.targetButton.properties[@"isSwipeable"] boolValue]];
@@ -794,7 +789,6 @@ CGFloat currentY;
     }
 
 
-    // Property: Background color
     UILabel *labelBGColor = [self addLabel:localize(@"custom_controls.button_edit.bg_color", nil)];
     self.colorWellBackground = [[UIColorWell alloc] initWithFrame:CGRectMake(width - 42.0, currentY - 5.0, 30.0, 30.0)];
     [self.colorWellBackground addTarget:self action:@selector(colorWellChanged) forControlEvents:UIControlEventValueChanged];
@@ -802,7 +796,6 @@ CGFloat currentY;
     [self.scrollView addSubview:self.colorWellBackground];
     currentY += labelBGColor.frame.size.height + 15.0;
 
-    // Property: Stroke width
     UILabel *labelStrokeWidth = [self addLabel:localize(@"custom_controls.button_edit.stroke_width", nil)];
     self.sliderStrokeWidth = [[DBNumberedSlider alloc] initWithFrame:CGRectMake(labelStrokeWidth.frame.size.width + 5.0, currentY - 5.0, width - labelStrokeWidth.frame.size.width - 5.0, 30.0)];
     self.sliderStrokeWidth.continuous = YES;
@@ -814,7 +807,6 @@ CGFloat currentY;
     currentY += labelStrokeWidth.frame.size.height + 15.0;
 
 
-    // Property: Stroke color
     UILabel *labelStrokeColor = [self addLabel:localize(@"custom_controls.button_edit.stroke_color", nil)];
     self.colorWellStroke = [[UIColorWell alloc] initWithFrame:CGRectMake(width - 42.0, currentY - 5.0, 30.0, 30.0)];
     [self.colorWellStroke addTarget:self action:@selector(colorWellChanged) forControlEvents:UIControlEventValueChanged];
@@ -823,7 +815,6 @@ CGFloat currentY;
     currentY += labelStrokeColor.frame.size.height + 15.0;
 
 
-    // Property: Corner radius
     if (![self.targetButton isKindOfClass:ControlJoystick.class]) {
         UILabel *labelCornerRadius = [self addLabel:localize(@"custom_controls.button_edit.corner_radius", nil)];
         self.sliderCornerRadius = [[DBNumberedSlider alloc] initWithFrame:CGRectMake(labelCornerRadius.frame.size.width + 5.0, currentY - 5.0, width - labelCornerRadius.frame.size.width - 5.0, 30.0)];
@@ -836,7 +827,6 @@ CGFloat currentY;
     }
 
 
-    // Property: Button Opacity
     UILabel *labelOpacity = [self addLabel:localize(@"custom_controls.button_edit.opacity", nil)];
     self.sliderOpacity = [[DBNumberedSlider alloc] initWithFrame:CGRectMake(labelOpacity.frame.size.width + 5.0, currentY - 5.0, width - labelOpacity.frame.size.width - 5.0, 30.0)];
     self.sliderOpacity.continuous = YES;
@@ -848,7 +838,6 @@ CGFloat currentY;
     currentY += labelOpacity.frame.size.height + 15.0;
 
 
-    // Property: Visibility
     self.arrVisibility = @[localize(@"Always", nil), localize(@"In game", nil), localize(@"In menu", nil)];
     UILabel *labelVisibility = [self addLabel:localize(@"custom_controls.button_edit.visibility", nil)];
     self.ctrlVisibility = [[UISegmentedControl alloc] initWithItems:self.arrVisibility];
@@ -862,7 +851,7 @@ CGFloat currentY;
         self.ctrlVisibility.selectedSegmentIndex = VISIBILITY_IN_GAME;
     } else if (displayInMenu) {
         self.ctrlVisibility.selectedSegmentIndex = VISIBILITY_IN_MENU;
-    } // else the segment is not chosen
+    }
     [self.scrollView addSubview:self.ctrlVisibility];
     currentY += labelVisibility.frame.size.height + 15.0;
 

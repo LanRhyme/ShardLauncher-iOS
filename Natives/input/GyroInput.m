@@ -13,7 +13,23 @@ static BOOL gyroInvertAxis, gyroSwapAxis;
 static CMMotionManager* cmInstance;
 
 + (void)updateOrientation {
-    UIInterfaceOrientation orientation = UIApplication.sharedApplication.windows[0].windowScene.interfaceOrientation;
+    UIInterfaceOrientation orientation = UIInterfaceOrientationUnknown;
+    if (@available(iOS 13.0, *)) {
+        // Find the active window scene to get the correct interface orientation
+        for (UIScene *scene in [[UIApplication sharedApplication] connectedScenes]) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                orientation = windowScene.interfaceOrientation;
+                break;
+            }
+        }
+    } else {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        #pragma clang diagnostic pop
+    }
+
     gyroInvertAxis =
         orientation==UIInterfaceOrientationPortraitUpsideDown ||
         orientation==UIInterfaceOrientationLandscapeLeft;

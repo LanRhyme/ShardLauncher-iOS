@@ -4,9 +4,8 @@
 #import "LauncherNavigationController.h"
 #import "LauncherPreferences.h"
 #import "utils.h"
-#import "UIKit+hook.h" // Import for _imageWithSize:
+#import "UIKit+hook.h"
 
-// Forward declarations for classes used in RightPaneViewController
 #import "authenticator/BaseAuthenticator.h"
 #import "AccountListViewController.h"
 #import "PLProfiles.h"
@@ -18,12 +17,10 @@
 
 @interface RightPaneViewController : UIViewController <UIPickerViewDataSource, PLPickerViewDelegate, UIPopoverPresentationControllerDelegate>
 
-// UI Elements
 @property (nonatomic, strong) UIImageView *avatarImageView;
 @property (nonatomic, strong) UILabel *usernameLabel;
 @property (nonatomic, strong) UILabel *accountTypeLabel;
 @property (nonatomic, strong) UIButton *accountButton;
-
 @property (nonatomic, strong) UITextField *profileTextField;
 @property (nonatomic, strong) PLPickerView *profilePickerView;
 @property (nonatomic, strong) UIButton *launchButton;
@@ -36,12 +33,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor systemBackgroundColor];
-
     [self setupUI];
     [self updateAccountInfo];
     
-    // The content controller is responsible for loading the profile list initially.
-    // We just need to reload the picker view once it's done.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadProfileList) name:@"ProfileListChanged" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAccountInfo) name:@"AuthInfoChanged" object:nil];
 }
@@ -51,22 +45,19 @@
 }
 
 - (void)setupUI {
-    // Avatar
     self.avatarImageView = [UIImageView new];
     self.avatarImageView.contentMode = UIViewContentModeScaleAspectFill;
-    self.avatarImageView.layer.cornerRadius = 12.0; // Rounded rectangle
+    self.avatarImageView.layer.cornerRadius = 12.0;
     self.avatarImageView.clipsToBounds = YES;
     self.avatarImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.avatarImageView];
 
-    // Username
     self.usernameLabel = [UILabel new];
     self.usernameLabel.font = [UIFont systemFontOfSize:18 weight:UIFontWeightSemibold];
     self.usernameLabel.textAlignment = NSTextAlignmentCenter;
     self.usernameLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.usernameLabel];
 
-    // Account Type
     self.accountTypeLabel = [UILabel new];
     self.accountTypeLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
     self.accountTypeLabel.textColor = [UIColor secondaryLabelColor];
@@ -74,20 +65,17 @@
     self.accountTypeLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.accountTypeLabel];
 
-    // Account Button (overlay on top of avatar/labels)
     self.accountButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.accountButton addTarget:self action:@selector(selectAccount:) forControlEvents:UIControlEventTouchUpInside];
     self.accountButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.accountButton];
 
-    // Share Log Button
     self.shareLogButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.shareLogButton setImage:[UIImage systemImageNamed:@"square.and.arrow.up"] forState:UIControlStateNormal];
     [self.shareLogButton addTarget:self action:@selector(shareLogs:) forControlEvents:UIControlEventTouchUpInside];
     self.shareLogButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.shareLogButton];
 
-    // Launch Button
     self.launchButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.launchButton setTitle:localize(@"Play", nil) forState:UIControlStateNormal];
     self.launchButton.titleLabel.font = [UIFont boldSystemFontOfSize:18];
@@ -98,7 +86,6 @@
     self.launchButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.launchButton];
 
-    // Profile TextField
     self.profileTextField = [[PickTextField alloc] init];
     self.profileTextField.placeholder = @"Select a profile...";
     self.profileTextField.textAlignment = NSTextAlignmentCenter;
@@ -109,55 +96,38 @@
     self.profileTextField.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.profileTextField];
 
-    // Profile Picker
     self.profilePickerView = [[PLPickerView alloc] init];
     self.profilePickerView.delegate = self;
     self.profilePickerView.dataSource = self;
     self.profileTextField.inputView = self.profilePickerView;
 
-    // --- Auto Layout Constraints ---
     UILayoutGuide *margins = self.view.layoutMarginsGuide;
-    [NSLayoutConstraint activateConstraints:@[        // Share Log Button (Top Right)
-        [self.shareLogButton.topAnchor constraintEqualToAnchor:margins.topAnchor constant:8],
+    [NSLayoutConstraint activateConstraints:@[        [self.shareLogButton.topAnchor constraintEqualToAnchor:margins.topAnchor constant:8],
         [self.shareLogButton.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor constant:-8],
-
-        // Avatar
         [self.avatarImageView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
         [self.avatarImageView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor constant:-100],
         [self.avatarImageView.widthAnchor constraintEqualToConstant:80],
         [self.avatarImageView.heightAnchor constraintEqualToConstant:80],
-
-        // Username
         [self.usernameLabel.topAnchor constraintEqualToAnchor:self.avatarImageView.bottomAnchor constant:12],
         [self.usernameLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16],
         [self.usernameLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-16],
-
-        // Account Type
         [self.accountTypeLabel.topAnchor constraintEqualToAnchor:self.usernameLabel.bottomAnchor constant:4],
         [self.accountTypeLabel.leadingAnchor constraintEqualToAnchor:self.usernameLabel.leadingAnchor],
         [self.accountTypeLabel.trailingAnchor constraintEqualToAnchor:self.usernameLabel.trailingAnchor],
-        
-        // Account Button (overlay)
         [self.accountButton.topAnchor constraintEqualToAnchor:self.avatarImageView.topAnchor],
         [self.accountButton.leadingAnchor constraintEqualToAnchor:self.avatarImageView.leadingAnchor],
         [self.accountButton.trailingAnchor constraintEqualToAnchor:self.avatarImageView.trailingAnchor],
         [self.accountButton.bottomAnchor constraintEqualToAnchor:self.accountTypeLabel.bottomAnchor],
-
-        // Launch Button (Bottom)
         [self.launchButton.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor constant:-20],
         [self.launchButton.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor constant:16],
         [self.launchButton.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor constant:-16],
         [self.launchButton.heightAnchor constraintEqualToConstant:50],
-
-        // Profile Selector (Above Launch Button)
         [self.profileTextField.bottomAnchor constraintEqualToAnchor:self.launchButton.topAnchor constant:-16],
         [self.profileTextField.leadingAnchor constraintEqualToAnchor:self.launchButton.leadingAnchor],
         [self.profileTextField.trailingAnchor constraintEqualToAnchor:self.launchButton.trailingAnchor],
         [self.profileTextField.heightAnchor constraintEqualToConstant:44],
     ]];
 }
-
-#pragma mark - Logic Migration
 
 - (void)updateAccountInfo {
     NSDictionary *selected = BaseAuthenticator.current.authData;
@@ -179,7 +149,6 @@
         self.accountTypeLabel.text = selected[@"xboxGamertag"];
     }
 
-    // Use Crafatar for better availability in China and apply rounded corners
     NSString *uuid = selected[@"uuid"];
     NSURL *avatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://crafatar.com/avatars/%@?size=128&overlay", uuid]];
     UIImage *placeholder = [UIImage imageNamed:@"DefaultAccount"];
@@ -219,7 +188,7 @@
 }
 
 - (void)launchGame:(UIButton *)sender {
-    LauncherNavigationController *contentNav = self.splitViewController.viewControllers[1];
+    LauncherNavigationController *contentNav = (LauncherNavigationController*)self.splitViewController.viewControllers[1];
     [contentNav performSelector:@selector(performInstallOrShowDetails:) withObject:sender];
 }
 
@@ -231,8 +200,6 @@
         [self pickerView:self.profilePickerView didSelectRow:selectedRow inComponent:0];
     }
 }
-
-#pragma mark - UIPickerViewDataSource & Delegate
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     return 1;
@@ -252,7 +219,6 @@
     self.profileTextField.text = [self pickerView:pickerView titleForRow:row forComponent:component];
     PLProfiles.current.selectedProfileName = self.profileTextField.text;
     
-    // Update profile icon using the correct method
     UIImageView *iconView = (UIImageView *)self.profileTextField.leftView;
     iconView.image = [pickerView imageAtRow:row column:component];
 }
@@ -264,9 +230,8 @@
     [imageView setImageWithURL:[NSURL URLWithString:urlString] placeholderImage:fallbackImage];
 }
 
-#pragma mark - UIPopoverPresentationControllerDelegate
 - (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller traitCollection:(UITraitCollection *)traitCollection {
-    return UIModalPresentationNone; // Ensure it's always a popover
+    return UIModalPresentationNone;
 }
 
 @end
@@ -279,31 +244,31 @@
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.systemBackgroundColor;
 
-    // 1. Create the view controllers for the three columns.
     LauncherMenuViewController *menuVc = [[LauncherMenuViewController alloc] init];
     UINavigationController *menuNav = [[UINavigationController alloc] initWithRootViewController:menuVc];
 
     LauncherNewsViewController *newsVc = [[LauncherNewsViewController alloc] init];
     LauncherNavigationController *contentNav = [[LauncherNavigationController alloc] initWithRootViewController:newsVc];
     contentNav.navigationBarHidden = YES;
-    contentNav.toolbarHidden = YES; // Hide the old toolbar
+    contentNav.toolbarHidden = YES;
 
     RightPaneViewController *rightPaneVc = [[RightPaneViewController alloc] init];
 
-    // 2. Set the view controllers for the triple-column layout.
-    self.viewControllers = @[menuNav, contentNav, rightPaneVc];
-
-    // 3. Configure column widths and behavior.
-    self.preferredSplitBehavior = UISplitViewControllerSplitBehaviorTile;
     if (@available(iOS 14.0, *)) {
+        // Correct Order: [Primary, Supplementary, Secondary]
+        self.viewControllers = @[menuNav, contentNav, rightPaneVc];
+        
+        self.preferredSplitBehavior = UISplitViewControllerSplitBehaviorTile;
         self.preferredDisplayMode = UISplitViewControllerDisplayModeTwoBesideSecondary;
-        // Right pane is 30% of the width
-        self.preferredSecondaryColumnWidth = self.view.bounds.size.width * 0.3;
+        
+        // Set widths
+        self.preferredPrimaryColumnWidth = 80;
+        // Set supplementary (middle) width to force the secondary (right) to be ~30%
+        self.preferredSupplementaryColumnWidth = self.view.bounds.size.width * 0.7 - 80;
+
+    } else {
+        self.viewControllers = @[menuNav, contentNav];
     }
-    
-    // Left menu is a fixed-width icon bar
-    self.preferredPrimaryColumnWidth = 80;
-    self.primaryEdge = UISplitViewControllerPrimaryEdgeLeading;
 }
 
 - (void)dismissViewController {

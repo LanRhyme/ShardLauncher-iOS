@@ -5,7 +5,6 @@
 #import "LauncherPrefManageJREViewController.h"
 #import "LauncherProfileEditorViewController.h"
 #import "LauncherProfilesViewController.h"
-//#import "NSFileManager+NRFileManager.h"
 #import "PLProfiles.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability-new"
@@ -23,7 +22,7 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
     kProfiles
 };
 
-@interface LauncherProfilesViewController () //<UIContextMenuInteractionDelegate>
+@interface LauncherProfilesViewController () 
 
 @property(nonatomic) UIBarButtonItem *createButtonItem;
 @end
@@ -54,11 +53,6 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
                     @"name": @"",
                     @"lastVersionId": @"latest-release"}];
             }],
-#if 0 // TODO
-        [UIAction
-            actionWithTitle:@"OptiFine" image:nil
-            identifier:@"optifine" handler:createHandler],
-#endif
         [UIAction
             actionWithTitle:@"Fabric/Quilt" image:nil
             identifier:@"fabric_or_quilt" handler:^(UIAction *action) {
@@ -84,13 +78,11 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    // Put navigation buttons back in place
-    self.navigationItem.rightBarButtonItems = @[[sidebarViewController drawAccountButton], self.createButtonItem];
+    self.navigationItem.rightBarButtonItem = self.createButtonItem;
 
-    // Pickup changes made in the profile editor and switching instance
     [PLProfiles updateCurrent];
     [self.tableView reloadData];
-    [self.navigationController performSelector:@selector(reloadProfileList)];
+    [(LauncherNavigationController*)self.navigationController reloadProfileList];
 }
 
 - (void)actionTogglePrefIsolation:(UISwitch *)sender {
@@ -123,7 +115,6 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
 
 - (void)presentNavigatedViewController:(UIViewController *)vc {
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-    //nav.navigationBar.prefersLargeTitles = YES;
     [self presentViewController:nav animated:YES completion:nil];
 }
 
@@ -233,7 +224,6 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
 
     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     NSString *title = localize(@"preference.title.confirm", nil);
-    // reusing the delete runtime message
     NSString *message = [NSString stringWithFormat:localize(@"preference.title.confirm.delete_runtime", nil), cell.textLabel.text];
     UIAlertController *confirmAlert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleActionSheet];
     confirmAlert.popoverPresentationController.sourceView = cell;
@@ -241,9 +231,8 @@ typedef NS_ENUM(NSUInteger, LauncherProfilesTableSection) {
     UIAlertAction *ok = [UIAlertAction actionWithTitle:localize(@"OK", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [PLProfiles.current.profiles removeObjectForKey:cell.textLabel.text];
         if ([PLProfiles.current.selectedProfileName isEqualToString:cell.textLabel.text]) {
-            // The one being deleted is the selected one, switch to the random one now
             PLProfiles.current.selectedProfileName = PLProfiles.current.profiles.allKeys[0];
-            [self.navigationController performSelector:@selector(reloadProfileList)];
+            [(LauncherNavigationController*)self.navigationController reloadProfileList];
         } else {
             [PLProfiles.current save];
         }
