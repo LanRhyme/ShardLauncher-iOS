@@ -37,7 +37,6 @@
             [self.prefSectionsVisibility addObject:@(self.prefSectionsVisible)];
         }
     } else {
-        // Display one singe section if prefSection is unspecified
         self.prefSectionsVisibility = (id)@[@YES];
     }
 }
@@ -52,13 +51,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    // Put navigation buttons back in place if we're first of the navigation controller
     if (self.hasDetail && self.navigationController) {
-        self.navigationItem.rightBarButtonItems = @[[sidebarViewController drawAccountButton], [self drawHelpButton]];
+        self.navigationItem.rightBarButtonItem = [self drawHelpButton];
     }
 
-    // Scan for child pane cells and reload them
-    // FIXME: any cheaper operations?
     NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
     for (int section = 0; section < self.prefContents.count; section++) {
         if (!self.prefSectionsVisibility[section].boolValue) {
@@ -113,7 +109,6 @@
         cell.detailTextLabel.numberOfLines = 0;
         cell.detailTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
     }
-    // Reset cell properties, as it could be reused
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.accessoryView = nil;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -137,7 +132,6 @@
             [NSString stringWithFormat:@"preference.title.%@", key]), nil);
     }
 
-    // Set general properties
     BOOL destructive = [item[@"destructive"] boolValue];
     cell.imageView.tintColor = destructive ? UIColor.systemRedColor : nil;
     cell.imageView.image = [UIImage systemImageNamed:item[@"icon"]];
@@ -149,7 +143,6 @@
         }
     }
 
-    // Check if one has enable condition and call if it does
     BOOL(^checkEnable)(void) = item[@"enableCondition"];
     cell.userInteractionEnabled = !checkEnable || checkEnable();
     cell.textLabel.enabled = cell.detailTextLabel.enabled = cell.userInteractionEnabled;
@@ -184,9 +177,7 @@
         view.autocorrectionType = UITextAutocorrectionTypeNo;
         view.autocapitalizationType = UITextAutocapitalizationTypeNone;
         view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin;
-        //view.contentVerticalAlignment = UIControlContentVerticalAlignmentTop;
         view.delegate = weakSelf;
-        //view.nonEditingLinebreakMode = NSLineBreakByCharWrapping;
         view.returnKeyType = UIReturnKeyDone;
         view.textAlignment = NSTextAlignmentRight;
         view.placeholder = localize((item[@"placeholder"] ? item[@"placeholder"] :
@@ -240,9 +231,6 @@
 
     BOOL(^isWarnable)(UIView *) = item[@"warnCondition"];
     NSString *warnKey = item[@"warnKey"];
-    // Display warning if: warn condition is met and either one of these:
-    // - does not have warnKey, always warn
-    // - has warnKey and its value is YES, warn once and set it to NO
     if (isWarnable && isWarnable(view) && (!warnKey || [self.getPreference(@"warnings", warnKey) boolValue])) {
         if (warnKey) {
             self.setPreference(@"warnings", warnKey, @NO);
@@ -270,7 +258,6 @@
     NSString *section = objc_getAssociatedObject(sender, @"section");
     NSString *key = item[@"key"];
 
-    // Special switches may define custom value instead of NO/YES
     NSArray *customSwitchValue = item[@"customSwitchValue"];
     self.setPreference(section, key, customSwitchValue ?
         customSwitchValue[sender.isOn] : @(sender.isOn));
@@ -280,10 +267,7 @@
         invokeAction(sender.isOn);
     }
 
-    // Some settings may affect the availability of other settings
-    // In this case, a switch may request to reload to apply user interaction change
     if ([item[@"requestReload"] boolValue]) {
-        // TODO: only reload needed rows
         [self.tableView reloadData];
     }
 }
@@ -311,7 +295,6 @@
         return;
     }
 
-    // userInterfaceIdiom = tvOS
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if (item[@"type"] == self.typeSwitch) {
         UISwitch *view = (id)cell.accessoryView;

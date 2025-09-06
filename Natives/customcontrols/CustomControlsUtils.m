@@ -95,8 +95,7 @@ void convertV2Layout(NSMutableDictionary* dict) {
     } else {
         #pragma clang diagnostic push
         #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-        if (keyWindow) insets = keyWindow.safeAreaInsets;
+        insets = [UIApplication sharedApplication].keyWindow.safeAreaInsets;
         #pragma clang diagnostic pop
     }
 
