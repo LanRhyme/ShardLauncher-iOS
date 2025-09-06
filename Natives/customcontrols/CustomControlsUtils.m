@@ -85,8 +85,13 @@ void convertV2Layout(NSMutableDictionary* dict) {
     
     UIEdgeInsets insets = UIEdgeInsetsZero;
     if (@available(iOS 13.0, *)) {
-        UIWindow *keyWindow = [[[UIApplication sharedApplication] connectedScenes] allObjects][0].windows.firstObject;
-        if (keyWindow) insets = keyWindow.safeAreaInsets;
+        for (UIScene *scene in [[UIApplication sharedApplication] connectedScenes]) {
+            if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass:[UIWindowScene class]]) {
+                UIWindowScene *windowScene = (UIWindowScene *)scene;
+                insets = windowScene.windows.firstObject.safeAreaInsets;
+                break;
+            }
+        }
     } else {
         #pragma clang diagnostic push
         #pragma clang diagnostic ignored "-Wdeprecated-declarations"

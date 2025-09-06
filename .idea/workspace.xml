@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui-1">
-      <change beforePath="$PROJECT_DIR$/Natives/LauncherProfilesViewController.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherProfilesViewController.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" beforeDir="false" afterPath="$PROJECT_DIR$/Natives/LauncherSplitViewController.m" afterDir="false" />
-    </list>
+    <list default="true" id="a691a8d5-5d8e-4db5-966b-a45b7efcae04" name="更改" comment=":tada: 新ui" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,14 +74,6 @@
       <workItem from="1756413840236" duration="38622000" />
       <workItem from="1756464968508" duration="3990000" />
       <workItem from="1756537556101" duration="432000" />
-    </task>
-    <task id="LOCAL-00026" summary=":tada: 名称修改">
-      <option name="closed" value="true" />
-      <created>1756431885545</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1756431885545</updated>
     </task>
     <task id="LOCAL-00027" summary=":tada: 名称修改">
       <option name="closed" value="true" />
@@ -470,7 +459,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757179745014</updated>
     </task>
-    <option name="localTasksCounter" value="75" />
+    <task id="LOCAL-00075" summary=":tada: 新ui">
+      <option name="closed" value="true" />
+      <created>1757180589279</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1757180589279</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -501,13 +498,13 @@
     <MESSAGE value=":tada: 大改ui" />
     <MESSAGE value=":tada: 更新workflow添加.app，修复ipa构建错误" />
     <MESSAGE value=":tada: 名称修改" />
-    <MESSAGE value=":tada: 新ui" />
     <MESSAGE value=":tada: 添加 联机 页面" />
     <MESSAGE value=":tada: 添加 联机 页面-修改项目目标为ios16.4" />
     <MESSAGE value=":tada: 添加 联机 页面-fix" />
     <MESSAGE value=":tada: 独立数据目录" />
     <MESSAGE value=":tada: 添加模拟器测试构建" />
     <MESSAGE value=":tada: 新ui-1" />
-    <option name="LAST_COMMIT_MESSAGE" value=":tada: 新ui-1" />
+    <MESSAGE value=":tada: 新ui" />
+    <option name="LAST_COMMIT_MESSAGE" value=":tada: 新ui" />
   </component>
 </project>
