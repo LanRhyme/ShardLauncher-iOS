@@ -64,15 +64,20 @@ UIImage* resizeImage(UIImage* image, CGSize newSize) {
     
     self.isInitialVc = YES;
     self.isSidebarCollapsed = YES; // Start collapsed
+    self.splitViewController.preferredPrimaryColumnWidth = 80;
     
     // Remove title view, as it takes up space
     self.navigationItem.titleView = nil;
     self.navigationItem.title = @"";
 
     // Add expand/collapse button
-    UIImage *expandIcon = resizeImage([UIImage imageNamed:@"MenuToggleExpand"], CGSizeMake(32, 32));
-    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:expandIcon style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
-    self.navigationItem.leftBarButtonItem = toggleButton;
+    UIButton *toggleButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+    [toggleButtonView setImage:[UIImage imageNamed:@"MenuToggleExpand"] forState:UIControlStateNormal];
+    toggleButtonView.frame = CGRectMake(0, 0, 32, 32);
+    [toggleButtonView.widthAnchor constraintEqualToConstant:32].active = YES;
+    [toggleButtonView.heightAnchor constraintEqualToConstant:32].active = YES;
+    [toggleButtonView addTarget:self action:@selector(toggleSidebar:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:toggleButtonView];
     
     self.options = @[
         [LauncherMenuCustomItem vcClass:LauncherNewsViewController.class],
@@ -122,9 +127,9 @@ UIImage* resizeImage(UIImage* image, CGSize newSize) {
     }];
 
     // Update button icon
+    UIButton *toggleButtonView = (UIButton *)((UIBarButtonItem *)self.navigationItem.leftBarButtonItem).customView;
     NSString *iconName = self.isSidebarCollapsed ? @"MenuToggleExpand" : @"MenuToggleCollapse";
-    UIImage *icon = resizeImage([UIImage imageNamed:iconName], CGSizeMake(32, 32));
-    ((UIBarButtonItem *)sender).image = icon;
+    [toggleButtonView setImage:[UIImage imageNamed:iconName] forState:UIControlStateNormal];
 
     // Reload table to show/hide text
     [self.tableView reloadData];

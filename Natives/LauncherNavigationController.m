@@ -320,18 +320,20 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 
         if (!progress.finished) return;
 
-        [self.progressVC dismissViewControllerAnimated:NO completion:^{
-            self.progressViewMain.observedProgress = nil;
-            if (self.task.metadata) {
-                [self invokeAfterJITEnabled:^{
-                    UIKit_launchMinecraftSurfaceVC(self.view.window, self.task.metadata);
-                }];
-            } else {
-                [self reloadProfileList];
-            }
-            self.task = nil;
-            [self setInteractionEnabled:YES forDownloading:YES];
-        }];
+        if (self.progressVC) {
+            [self.progressVC dismissViewControllerAnimated:NO completion:nil];
+        }
+
+        self.progressViewMain.observedProgress = nil;
+        if (self.task.metadata) {
+            [self invokeAfterJITEnabled:^{
+                UIKit_launchMinecraftSurfaceVC(self.view.window, self.task.metadata);
+            }];
+        } else {
+            [self reloadProfileList];
+        }
+        self.task = nil;
+        [self setInteractionEnabled:YES forDownloading:YES];
     });
 }
 
