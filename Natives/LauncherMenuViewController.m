@@ -70,8 +70,8 @@ UIImage* resizeImage(UIImage* image, CGSize newSize) {
     self.navigationItem.title = @"";
 
     // Add expand/collapse button
-    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:28];
-    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage systemImageNamed:@"sidebar.right"] imageWithConfiguration:config] style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
+    UIImage *expandIcon = resizeImage([UIImage imageNamed:@"MenuToggleExpand"], CGSizeMake(32, 32));
+    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:expandIcon style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
     self.navigationItem.leftBarButtonItem = toggleButton;
     
     self.options = @[
@@ -109,17 +109,23 @@ UIImage* resizeImage(UIImage* image, CGSize newSize) {
 
 - (void)toggleSidebar:(id)sender {
     self.isSidebarCollapsed = !self.isSidebarCollapsed;
-    
+
+    CGFloat expandedWidth = 240;
+    if (realUIIdiom == UIUserInterfaceIdiomPad) {
+        // On iPad, the expanded width is 30% of the screen.
+        expandedWidth = self.view.window.bounds.size.width * 0.3;
+    }
+
     // Animate the width change
     [UIView animateWithDuration:0.3 animations:^{
-        self.splitViewController.preferredPrimaryColumnWidth = self.isSidebarCollapsed ? 80 : 240;
+        self.splitViewController.preferredPrimaryColumnWidth = self.isSidebarCollapsed ? 80 : expandedWidth;
     }];
-    
+
     // Update button icon
-    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:28];
-    NSString *iconName = self.isSidebarCollapsed ? @"sidebar.right" : @"sidebar.left";
-    ((UIBarButtonItem *)sender).image = [[UIImage systemImageNamed:iconName] imageWithConfiguration:config];
-    
+    NSString *iconName = self.isSidebarCollapsed ? @"MenuToggleExpand" : @"MenuToggleCollapse";
+    UIImage *icon = resizeImage([UIImage imageNamed:iconName], CGSizeMake(32, 32));
+    ((UIBarButtonItem *)sender).image = icon;
+
     // Reload table to show/hide text
     [self.tableView reloadData];
     [self restoreHighlightedSelection];

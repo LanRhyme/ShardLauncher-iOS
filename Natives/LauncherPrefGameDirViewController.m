@@ -16,6 +16,7 @@
 {
     [super viewDidLoad];
     [self setTitle:localize(@"preference.title.game_directory", nil)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:localize(@"Back", nil) style:UIBarButtonItemStylePlain target:self action:@selector(actionBack)];
 
     self.array = [[NSMutableArray alloc] init];
     [self.array addObject:@"default"];
@@ -35,6 +36,10 @@
             [self.array addObject:file];
         }
     }
+}
+
+- (void)actionBack {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)changeSelectionTo:(NSString *)name {
