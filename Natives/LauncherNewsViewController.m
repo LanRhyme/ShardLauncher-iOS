@@ -59,9 +59,9 @@ WKWebView *webView;
     if(!isJailbroken && getPrefBool(@"warnings.limited_ram_warn") && (roundf(NSProcessInfo.processInfo.physicalMemory / 0x1000000) < 3900)) {
         [self showWarningAlert:@"limited_ram" hasPreference:YES exitWhenCompleted:NO];
     }
-    if (@available(iOS 16.0, *)) {
+    /* if (@available(iOS 16.0, *)) {
         [self showWarningAlert:@"ios16_jitdead" hasPreference:NO exitWhenCompleted:YES];
-    }
+    } */
 }
 
 -(void)showWarningAlert:(NSString *)key hasPreference:(BOOL)isPreferenced exitWhenCompleted:(BOOL)shouldExit {

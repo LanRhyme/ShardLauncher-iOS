@@ -102,8 +102,7 @@
     [self.view addSubview:self.infoLabel];
 
     // Layout
-    [NSLayoutConstraint activateConstraints:@[
-        [self.statusLabel.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:8],
+    [NSLayoutConstraint activateConstraints:@[[self.statusLabel.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:8],
         [self.statusLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16],
         [self.statusLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-16],
 
@@ -129,8 +128,7 @@
         
         [self.infoLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20],
         [self.infoLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:20],
-        [self.infoLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20],
-    ]];
+        [self.infoLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-20]]];
 }
 
 - (void)updateUIForConnectionState {
@@ -143,7 +141,7 @@
 }
 
 - (NSString *)imageName {
-    return @"network";
+    return @"MenuOnline";
 }
 
 #pragma mark - Actions

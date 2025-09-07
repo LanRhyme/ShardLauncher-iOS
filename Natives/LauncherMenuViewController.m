@@ -18,6 +18,15 @@
 
 #include <dlfcn.h>
 
+// Helper function to resize images
+UIImage* resizeImage(UIImage* image, CGSize newSize) {
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
 @implementation LauncherMenuCustomItem
 
 + (LauncherMenuCustomItem *)title:(NSString *)title imageName:(NSString *)imageName action:(id)action {
@@ -61,7 +70,8 @@
     self.navigationItem.title = @"";
 
     // Add expand/collapse button
-    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"sidebar.right"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
+    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:28];
+    UIBarButtonItem *toggleButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage systemImageNamed:@"sidebar.right"] imageWithConfiguration:config] style:UIBarButtonItemStylePlain target:self action:@selector(toggleSidebar:)];
     self.navigationItem.leftBarButtonItem = toggleButton;
     
     self.options = @[
@@ -106,8 +116,9 @@
     }];
     
     // Update button icon
+    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:28];
     NSString *iconName = self.isSidebarCollapsed ? @"sidebar.right" : @"sidebar.left";
-    ((UIBarButtonItem *)sender).image = [UIImage systemImageNamed:iconName];
+    ((UIBarButtonItem *)sender).image = [[UIImage systemImageNamed:iconName] imageWithConfiguration:config];
     
     // Reload table to show/hide text
     [self.tableView reloadData];
@@ -138,22 +149,15 @@
         cell.textLabel.text = [self.options[indexPath.row] title];
     }
     
-    // Use a dynamic color for the icons
-    UIColor *iconColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-            return [UIColor colorWithRed:0.4 green:0.8 blue:0.4 alpha:1.0]; // Deep Green
-        } else {
-            return [UIColor colorWithRed:0.6 green:1.0 blue:0.6 alpha:1.0]; // Light Green
-        }
-    }];
-    
     UIImage *origImage = [UIImage imageNamed:[self.options[indexPath.row] imageName]];
     if (!origImage) {
         origImage = [UIImage systemImageNamed:[self.options[indexPath.row] imageName]];
     }
     
-    cell.imageView.image = [origImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    cell.imageView.tintColor = iconColor;
+    // Resize and set icon
+    UIImage *resizedImage = resizeImage(origImage, CGSizeMake(28, 28));
+    cell.imageView.image = [resizedImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    cell.imageView.tintColor = [UIColor secondaryLabelColor];
     
     return cell;
 }
@@ -183,8 +187,5 @@
         }
     }
 }
-
-// Removed drawAccountButton, updateAccountInfo, selectAccount as they are moved to RightPaneViewController
-// Removed JIT-related code as it's not relevant to the menu UI itself
 
 @end
