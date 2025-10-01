@@ -100,11 +100,15 @@ void init_loadCustomJvmFlags(int* argc, const char** argv) {
 int launchJVM(NSString *username, id launchTarget, int width, int height, int minVersion) {
     NSLog(@"[JavaLauncher] Beginning JVM launch");
 
-    if (NSBundle.mainBundle.infoDictionary[@"LCDataUUID"]) {
+    if ([NSFileManager.defaultManager fileExistsAtPath:[NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"LCAppInfo.plist"]]) {
         NSDebugLog(@"[JavaLauncher] Running in LiveContainer, skipping dyld patch");
     } else {
-        // Activate Library Validation bypass for external runtime and dylibs (JNA, etc)
-        init_bypassDyldLibValidation();
+        if(@available(iOS 19.0, *)) {
+            // Disable Library Validation bypass for iOS 26 because of stricter JIT
+        } else {
+            // Activate Library Validation bypass for external runtime and dylibs (JNA, etc)
+            init_bypassDyldLibValidation();
+        }
     }
 
 
@@ -221,6 +225,11 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     // Workaround random stack guard allocation crashes
     margv[++margc] = "-XX:+UnlockExperimentalVMOptions";
     margv[++margc] = "-XX:+DisablePrimordialThreadGuardPages";
+
+    // On iOS 26, use mirror mapped JIT by default
+    if (@available(iOS 26.0, *)) {
+        margv[++margc] = "-XX:+MirrorMappedCodeCache";
+    }
 
     // Disable Forge 1.16.x early progress window
     margv[++margc] = "-Dfml.earlyprogresswindow=false";
