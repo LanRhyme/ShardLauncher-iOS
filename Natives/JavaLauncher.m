@@ -227,7 +227,7 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     margv[++margc] = "-XX:+DisablePrimordialThreadGuardPages";
 
     // On iOS 26, use mirror mapped JIT by default
-    if (@available(iOS 26.0, *)) {
+    if (@available(iOS 26.0, *) && minVersion != 8) {
         margv[++margc] = "-XX:+MirrorMappedCodeCache";
     }
 
